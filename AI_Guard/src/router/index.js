@@ -3,12 +3,13 @@ import Admin from '../Views/admin.vue'
 import Graph from '../Views/graph.vue'
 import Live from '../Views/live.vue'
 import Log from '../Views/log.vue'
+import Home from '../Views/home.vue'
 
 const routes = [
   {
     path: '/',
     name: 'Home',
-    redirect: '/graph'
+    redirect: '/home'
   },
   {
     path: '/admin',
@@ -29,6 +30,11 @@ const routes = [
     path: '/log',
     name: 'Log',
     component: Log
+  },
+  {
+    path: '/home',
+    name: 'Home',
+    component: Home
   }
 ]
 
