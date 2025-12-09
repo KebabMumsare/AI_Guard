@@ -8,15 +8,28 @@ onMounted(() => {
   // Prevent body scrolling to keep content in one screen
   document.body.style.overflowY = 'hidden'
   
+  // Force animations to trigger on Windows browsers
+  requestAnimationFrame(() => {
+    const elements = document.querySelectorAll('.animate-title, .animate-text, .animate-created, .animate-button, .animate-image')
+    elements.forEach((el) => {
+      const htmlEl = el
+      // Force reflow to trigger animations
+      void htmlEl.offsetHeight
+      // Ensure animation is applied
+      htmlEl.style.animationPlayState = 'running'
+    })
+  })
+  
   // Fallback: ensure content is visible after animations should complete
   setTimeout(() => {
     const elements = document.querySelectorAll('.animate-title, .animate-text, .animate-created, .animate-button, .animate-image')
     elements.forEach((el) => {
       const htmlEl = el
       const computedStyle = window.getComputedStyle(htmlEl)
-      if (computedStyle.opacity === '0') {
+      if (computedStyle.opacity === '0' || parseFloat(computedStyle.opacity) < 0.1) {
         htmlEl.style.opacity = '1'
-        htmlEl.style.transform = ''
+        htmlEl.style.transform = 'translateY(0) translateX(0)'
+        htmlEl.style.animation = 'none'
       }
     })
   }, 2000)
@@ -100,55 +113,119 @@ onUnmounted(() => {
   }
 }
 
-/* Clean Entrance Animations */
+/* Clean Entrance Animations - Cross-browser compatible */
 .animate-title {
   opacity: 0;
+  -webkit-transform: translateY(20px);
   transform: translateY(20px);
+  -webkit-animation: fadeInUp 0.8s ease-out 0s forwards;
   animation: fadeInUp 0.8s ease-out 0s forwards;
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
 }
 
 .animate-text {
   opacity: 0;
+  -webkit-transform: translateY(20px);
   transform: translateY(20px);
+  -webkit-animation: fadeInUp 0.8s ease-out 0.3s forwards;
   animation: fadeInUp 0.8s ease-out 0.3s forwards;
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
 }
 
 .animate-created {
   opacity: 0;
+  -webkit-transform: translateY(20px);
   transform: translateY(20px);
+  -webkit-animation: fadeInUp 0.8s ease-out 0.5s forwards;
   animation: fadeInUp 0.8s ease-out 0.5s forwards;
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
 }
 
 .animate-button {
   opacity: 0;
+  -webkit-transform: translateX(-30px);
   transform: translateX(-30px);
+  -webkit-animation: slideInLeft 0.8s ease-out 0.7s forwards;
   animation: slideInLeft 0.8s ease-out 0.7s forwards;
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
 }
 
 .animate-image {
   opacity: 0;
+  -webkit-transform: translateX(30px);
   transform: translateX(30px);
+  -webkit-animation: fadeInRight 0.8s ease-out 0.2s forwards, float 3s ease-in-out 1s infinite;
   animation: fadeInRight 0.8s ease-out 0.2s forwards, float 3s ease-in-out 1s infinite;
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+}
+
+/* Keyframes with vendor prefixes for cross-browser support */
+@-webkit-keyframes fadeInUp {
+  from {
+    opacity: 0;
+    -webkit-transform: translateY(20px);
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    -webkit-transform: translateY(0);
+    transform: translateY(0);
+  }
 }
 
 @keyframes fadeInUp {
   from {
     opacity: 0;
+    -webkit-transform: translateY(20px);
     transform: translateY(20px);
   }
   to {
     opacity: 1;
+    -webkit-transform: translateY(0);
     transform: translateY(0);
+  }
+}
+
+@-webkit-keyframes fadeInRight {
+  from {
+    opacity: 0;
+    -webkit-transform: translateX(30px);
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    -webkit-transform: translateX(0);
+    transform: translateX(0);
   }
 }
 
 @keyframes fadeInRight {
   from {
     opacity: 0;
+    -webkit-transform: translateX(30px);
     transform: translateX(30px);
   }
   to {
     opacity: 1;
+    -webkit-transform: translateX(0);
+    transform: translateX(0);
+  }
+}
+
+@-webkit-keyframes slideInLeft {
+  from {
+    opacity: 0;
+    -webkit-transform: translateX(-30px);
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    -webkit-transform: translateX(0);
     transform: translateX(0);
   }
 }
@@ -156,19 +233,34 @@ onUnmounted(() => {
 @keyframes slideInLeft {
   from {
     opacity: 0;
+    -webkit-transform: translateX(-30px);
     transform: translateX(-30px);
   }
   to {
     opacity: 1;
+    -webkit-transform: translateX(0);
     transform: translateX(0);
+  }
+}
+
+@-webkit-keyframes float {
+  0%, 100% {
+    -webkit-transform: translateY(0px);
+    transform: translateY(0px);
+  }
+  50% {
+    -webkit-transform: translateY(-10px);
+    transform: translateY(-10px);
   }
 }
 
 @keyframes float {
   0%, 100% {
+    -webkit-transform: translateY(0px);
     transform: translateY(0px);
   }
   50% {
+    -webkit-transform: translateY(-10px);
     transform: translateY(-10px);
   }
 }
@@ -213,22 +305,25 @@ onUnmounted(() => {
 }
 
 .link-hover-glow {
-  transition: all 0.3s ease;
+  -webkit-transition: color 0.2s ease, text-shadow 0.2s ease;
+  transition: color 0.2s ease, text-shadow 0.2s ease;
   text-decoration: none;
   position: relative;
+  display: inline-block;
 }
 
 .link-hover-glow:hover {
   color: #7ae570;
-  text-shadow: 0 0 10px rgba(143, 254, 131, 0.8), 0 0 20px rgba(143, 254, 131, 0.4);
-  transform: translateY(-2px);
+  text-shadow: 0 0 8px rgba(143, 254, 131, 0.6);
   text-decoration: underline;
 }
 
 /* Responsive adjustments for mobile */
 @media (max-width: 1023px) {
   .animate-image {
+    -webkit-transform: translateY(20px);
     transform: translateY(20px);
+    -webkit-animation: fadeInUp 0.8s ease-out 0.2s forwards, float 3s ease-in-out 1s infinite;
     animation: fadeInUp 0.8s ease-out 0.2s forwards, float 3s ease-in-out 1s infinite;
   }
 }
