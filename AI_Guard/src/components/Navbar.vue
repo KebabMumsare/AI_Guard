@@ -1,13 +1,21 @@
 <template>
   <nav class="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 w-auto max-w-6xl">
-    <div class="bg-graphite-black/90 backdrop-blur-md rounded-full px-10 py-4 shadow-lg border border-white/10 flex items-center gap-12">
+    <div class="bg-graphite-black/95 backdrop-blur-md rounded-full px-10 py-4 shadow-2xl shadow-black/50 border border-lime-500/30 flex items-center gap-12">
       <!-- Logo -->
       <div class="flex items-center">
-        <span class="text-2xl font-bold text-white tracking-wide">AI_Guard</span>
+        <span class="text-2xl font-bold text-white tracking-wide">AI-Guard</span>
       </div>
 
       <!-- Links -->
       <ul class="flex items-center gap-8 m-0 p-0 list-none">
+        <li>
+          <router-link 
+            to="/home" 
+            class="nav-link"
+          >
+            Home
+          </router-link>
+        </li>
         <li>
           <router-link 
             to="/graph" 
@@ -46,12 +54,12 @@
 </template>
 
 <script setup>
-// No script logic needed for basic navbar currently
+
 </script>
 
 <style scoped>
 .nav-link {
-  color: #ffffff;
+  color: #FFFFFF;
   font-size: 1rem;
   font-weight: 500;
   text-decoration: none;
@@ -61,11 +69,11 @@
 }
 
 .nav-link:hover {
-  color: #8ffe83; /* neon-green */
+  color: #8ffe83;
 }
 
 .nav-link.router-link-active {
-  color: #8ffe83; /* neon-green */
+  color: #8ffe83;
   border-bottom-color: #8ffe83;
 }
 </style>
