@@ -1,11 +1,32 @@
-<script setup></script>
+<script setup>
+</script>
 
 <template>
-  <h1>You did it!</h1>
-  <p>
-    Visit <a href="https://vuejs.org/" target="_blank" rel="noopener">vuejs.org</a> to read the
-    documentation
-  </p>
+  <div id="app">
+    <nav>
+      <router-link to="/admin">Admin</router-link> |
+      <router-link to="/graph">Graph</router-link> |
+      <router-link to="/live">Live</router-link> |
+      <router-link to="/log">Log</router-link>
+    </nav>
+    <router-view />
+  </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+nav {
+  padding: 20px;
+  text-align: center;
+}
+
+nav a {
+  margin: 0 10px;
+  text-decoration: none;
+  color: #42b983;
+  font-weight: bold;
+}
+
+nav a.router-link-active {
+  color: #35495e;
+}
+</style>
