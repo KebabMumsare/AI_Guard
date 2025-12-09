@@ -22,12 +22,12 @@ nav {
 nav a {
   margin: 0 10px;
   text-decoration: none;
-  color: #42b983;
+  color: #8ffe83;
   font-weight: bold;
 }
 
 nav a.router-link-active {
-  color: #35495e;
+  color: #5faa57;
 }
 #app {
   min-height: 100vh;
