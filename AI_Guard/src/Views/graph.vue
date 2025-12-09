@@ -3,7 +3,7 @@
 </script>
 
 <template>
-  <div>
+  <div >
     <h1>Graph</h1>
     <a href="app.vue"></a>
   </div>

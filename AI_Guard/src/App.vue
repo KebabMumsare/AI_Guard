@@ -2,7 +2,7 @@
 </script>
 
 <template>
-  <div id="app">
+  <div id="app" >
     <nav>
       <router-link to="/admin">Admin</router-link> |
       <router-link to="/graph">Graph</router-link> |
@@ -28,5 +28,9 @@ nav a {
 
 nav a.router-link-active {
   color: #35495e;
+}
+#app {
+  min-height: 100vh;
+  background-color: #37393B;
 }
 </style>
