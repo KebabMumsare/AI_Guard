@@ -28,6 +28,7 @@ nav a {
 
 nav a.router-link-active {
   color: #5faa57;
+  text-decoration: underline;
 }
 #app {
   min-height: 100vh;
