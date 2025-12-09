@@ -1,4 +1,5 @@
 <script setup>
+import Navbar from './components/Navbar.vue'
 </script>
 
 <template>
@@ -34,4 +35,8 @@ nav a.router-link-active {
   min-height: 100vh;
   background-color: #37393B;
 }
+body {
+  @apply bg-neutral-900;
+}
 </style>
+
