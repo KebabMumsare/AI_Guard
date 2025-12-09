@@ -9,7 +9,7 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    redirect: '/home'
+    component: Home
   },
   {
     path: '/admin',
@@ -33,8 +33,12 @@ const routes = [
   },
   {
     path: '/home',
-    name: 'Home',
+    name: 'HomePage',
     component: Home
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/'
   }
 ]
 
