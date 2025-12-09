@@ -45,15 +45,10 @@
 }
 
 .nav-link.router-link-active {
-  color: #5faa57;
+  color: #8ffe83;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
   padding-bottom: 5px;
-  border-bottom: 2px solid transparent;
-}
-
-nav a.router-link-active {
-  color: #8ffe83;
-  border-bottom-color: #8ffe83;
+  border-bottom: 2.5px solid #8ffe83;
 }
 
 .separator {
