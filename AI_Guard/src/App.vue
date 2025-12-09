@@ -4,33 +4,12 @@ import Navbar from './components/Navbar.vue'
 
 <template>
   <div id="app" >
-    <nav>
-      <router-link to="/admin">Admin</router-link> |
-      <router-link to="/graph">Graph</router-link> |
-      <router-link to="/home">Home</router-link> |
-      <router-link to="/live">Live</router-link> |
-      <router-link to="/log">Log</router-link> |
-    </nav>
+    <Navbar />
     <router-view />
   </div>
 </template>
 
 <style scoped>
-nav {
-  padding: 20px;
-  text-align: center
-}
-
-nav a {
-  margin: 0 10px;
-  text-decoration: none;
-  color: #8ffe83;
-  font-weight: bold;
-}
-
-nav a.router-link-active {
-  color: #5faa57;
-}
 #app {
   min-height: 100vh;
   background-color: #37393B;
@@ -39,4 +18,3 @@ body {
   @apply bg-neutral-900;
 }
 </style>
-
