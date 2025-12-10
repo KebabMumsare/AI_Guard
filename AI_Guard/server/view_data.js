@@ -1,26 +1,36 @@
 import sqlite3 from 'sqlite3';
-import { open } from 'sqlite';
 
 // Open the database
-const dbPromise = open({
-    filename: './ai_guard.db',
-    driver: sqlite3.Database
+const db = new sqlite3.Database('./ai_guard.db', (err) => {
+    if (err) {
+        console.error('Error opening database:', err.message);
+        process.exit(1);
+    }
 });
 
-const viewData = async () => {
-    try {
-        const db = await dbPromise;
-        const logs = await db.all('SELECT * FROM logs');
+const viewData = () => {
+    const sql = 'SELECT * FROM logs';
 
-        if (logs.length === 0) {
+    db.all(sql, [], (err, rows) => {
+        if (err) {
+            console.error('Error reading logs:', err.message);
+            return;
+        }
+
+        if (rows.length === 0) {
             console.log('No logs found in the database.');
         } else {
-            console.log(`Found ${logs.length} logs:`);
-            console.table(logs);
+            console.log(`Found ${rows.length} logs:`);
+            console.table(rows);
         }
-    } catch (err) {
-        console.error('Error reading database:', err);
-    }
+
+        // Close the database connection
+        db.close((err) => {
+            if (err) {
+                console.error('Error closing database:', err.message);
+            }
+        });
+    });
 };
 
 viewData();
