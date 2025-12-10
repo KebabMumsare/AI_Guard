@@ -153,9 +153,20 @@ onMounted(() => {
 .live-title {
   color: #8ffe83;
   font-weight: bold;
-  font-size: 2rem;
   margin-bottom: 1.5rem;
   text-align: center;
+}
+
+@media (min-width: 640px) {
+  .live-title {
+    font-size: 3rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .live-title {
+    font-size: 3rem;
+  }
 }
 
 .live-content-wrapper {
