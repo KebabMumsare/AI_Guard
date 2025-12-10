@@ -11,7 +11,6 @@ const processEventData = (eventName) => {
   const groupedByDate = {}
   filteredEvents.forEach(event => {
     const date = new Date(event.timestamp)
-    //Get date string in YYYY-MM-DD format
     const dateKey = date.toISOString().split('T')[0]
     
     if (!groupedByDate[dateKey]) {
