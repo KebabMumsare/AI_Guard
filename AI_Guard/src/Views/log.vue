@@ -8,7 +8,7 @@ const error = ref(null);
 const fetchLogs = async () => {
   loading.value = true;
   try {
-    const response = await fetch('http://localhost:3000/api/logs');
+    const response = await fetch('/api/logs');
     if (!response.ok) throw new Error('Failed to fetch logs');
     const data = await response.json();
     logs.value = data.logs;
