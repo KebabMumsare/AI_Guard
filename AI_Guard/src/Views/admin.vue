@@ -84,7 +84,6 @@ const selectSection = (sectionId) => {
     <h1 class="admin-title">Admin Panel</h1>
     
     <div class="admin-layout">
-      <!-- Sidebar -->
       <div class="admin-sidebar">
         <nav class="sidebar-menu">
           <div 
@@ -101,9 +100,7 @@ const selectSection = (sectionId) => {
         </nav>
       </div>
 
-      <!-- Main Content -->
       <div class="admin-main">
-        <!-- Status Section -->
         <div v-if="activeSection === 'status'" class="content-panel">
           <h2 class="panel-title">System Status</h2>
           <div class="form-section">
@@ -132,7 +129,6 @@ const selectSection = (sectionId) => {
           </div>
         </div>
 
-        <!-- Alarm Section -->
         <div v-if="activeSection === 'alarm'" class="content-panel">
           <h2 class="panel-title">Alarm Settings</h2>
           <div class="form-section">
@@ -154,7 +150,6 @@ const selectSection = (sectionId) => {
           </div>
         </div>
 
-        <!-- Detection Section -->
         <div v-if="activeSection === 'detection'" class="content-panel">
           <h2 class="panel-title">Detection Settings</h2>
           <div class="form-section">
@@ -194,7 +189,6 @@ const selectSection = (sectionId) => {
           </div>
         </div>
 
-        <!-- System Section -->
         <div v-if="activeSection === 'system'" class="content-panel">
           <h2 class="panel-title">System Management</h2>
           <div class="form-section">
@@ -218,7 +212,6 @@ const selectSection = (sectionId) => {
           </div>
         </div>
 
-        <!-- Network Section -->
         <div v-if="activeSection === 'network'" class="content-panel">
           <h2 class="panel-title">Network Settings</h2>
           <div class="form-section">
@@ -261,7 +254,6 @@ const selectSection = (sectionId) => {
               </div>
             </div>
             
-            <!-- Eye Icon that follows cursor - only show when hovering over hidden IP -->
             <div 
               v-if="hoveredSpoiler && ((hoveredSpoiler === 'jetson' && !showJetsonIP) || (hoveredSpoiler === 'raspberry' && !showRaspberryIP))"
               class="eye-icon"
@@ -318,18 +310,16 @@ const selectSection = (sectionId) => {
   }
 }
 
-/* Layout */
 .admin-layout {
   display: flex;
   gap: 3rem;
   width: 100%;
-  max-width: 90rem; /* 1440px - simple max width */
+  max-width: 90rem;
   justify-content: center;
 }
 
-/* Sidebar */
 .admin-sidebar {
-  width: 20rem; /* 320px - simple sidebar width */
+  width: 20rem;
   background-color: #37393B;
   border: 0.2rem solid rgba(143, 254, 131, 0.2);
   border-radius: 0;
@@ -364,7 +354,6 @@ const selectSection = (sectionId) => {
   font-weight: 600;
 }
 
-/* Main Content */
 .admin-main {
   flex: 1;
   max-width: 65rem;
@@ -391,7 +380,6 @@ const selectSection = (sectionId) => {
   border-bottom: 0.2rem solid rgba(143, 254, 131, 0.2);
 }
 
-/* Form Styles */
 .form-section {
   display: flex;
   flex-direction: column;
@@ -418,7 +406,6 @@ const selectSection = (sectionId) => {
   margin-bottom: 0.75rem;
 }
 
-/* Status Display */
 .status-box {
   display: flex;
   align-items: center;
@@ -463,7 +450,6 @@ const selectSection = (sectionId) => {
   border-radius: 0.3rem;
 }
 
-/* Toggle Switch */
 .toggle-wrapper {
   display: flex;
   align-items: center;
@@ -521,7 +507,6 @@ input:checked + .toggle-slider:before {
   font-weight: 500;
 }
 
-/* Input */
 .router-input {
   padding: 0.75rem 1rem;
   border: 0.15rem solid rgba(143, 254, 131, 0.2);
@@ -545,7 +530,6 @@ input:checked + .toggle-slider:before {
   opacity: 0.7;
 }
 
-/* Buttons */
 .router-button {
   padding: 1rem 2rem;
   background-color: #8ffe83;
@@ -581,7 +565,6 @@ input:checked + .toggle-slider:before {
   box-shadow: 0 0.3rem 0.5rem rgba(239, 68, 68, 0.4);
 }
 
-/* IP Spoiler Styles */
 .ip-hidden {
   width: 100%;
   cursor: pointer;
@@ -641,7 +624,6 @@ input:checked + .toggle-slider:before {
   }
 }
 
-/* Eye Icon that follows cursor */
 .eye-icon {
   position: fixed;
   pointer-events: none;
@@ -658,7 +640,6 @@ input:checked + .toggle-slider:before {
   height: 100%;
 }
 
-/* Responsive */
 @media (max-width: 48rem) {
   .admin-container {
     padding: 2vh 1rem;

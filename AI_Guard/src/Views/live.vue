@@ -4,7 +4,7 @@ import { ref, onMounted, onUnmounted } from 'vue'
 const isLive = ref(true)
 const isFullscreen = ref(false)
 const cameraName = ref('Camera 1')
-const connectionStatus = ref('online') // 'online', 'offline', 'connecting'
+const connectionStatus = ref('online')
 const currentTime = ref(new Date().toLocaleTimeString())
 const recentEvents = ref([
   { type: 'Motion Detected', time: '14:32:15' },
@@ -12,7 +12,6 @@ const recentEvents = ref([
   { type: 'Motion Detected', time: '14:25:10' }
 ])
 
-// Update time every second
 let timeInterval = null
 
 onMounted(() => {
@@ -41,7 +40,6 @@ const toggleFullscreen = () => {
   isFullscreen.value = !isFullscreen.value
 }
 
-// Listen for fullscreen changes
 onMounted(() => {
   document.addEventListener('fullscreenchange', () => {
     isFullscreen.value = !!document.fullscreenElement
@@ -54,10 +52,8 @@ onMounted(() => {
     <h1 class="live-title">Live Camera Feed</h1>
     
     <div class="live-content-wrapper">
-      <!-- Main Video Container -->
       <div class="video-section">
         <div class="video-container relative w-full bg-black overflow-hidden">
-          <!-- Video Element Placeholder -->
           <div class="w-full h-full flex items-center justify-center bg-black" style="aspect-ratio: 16/9; min-height: 400px;">
             <div class="text-center">
               <div class="text-[#8ffe83] text-lg sm:text-xl md:text-2xl mb-2">Camera Feed</div>
@@ -65,13 +61,11 @@ onMounted(() => {
             </div>
           </div>
           
-          <!-- Live Indicator -->
           <div class="absolute top-4 left-4 flex items-center gap-2 bg-black bg-opacity-70 px-3 py-1.5 rounded-md">
             <div class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
             <span class="text-white text-xs sm:text-sm font-semibold">LIVE</span>
           </div>
           
-          <!-- Connection Status -->
           <div class="absolute top-4 right-4 flex items-center gap-2 bg-black bg-opacity-70 px-3 py-1.5 rounded-md">
             <div 
               :class="{
@@ -84,7 +78,6 @@ onMounted(() => {
             <span class="text-white text-xs sm:text-sm capitalize">{{ connectionStatus }}</span>
           </div>
           
-          <!-- Fullscreen Button -->
           <button 
             @click="toggleFullscreen"
             class="absolute bottom-4 right-4 bg-black bg-opacity-70 hover:bg-opacity-90 text-[#8ffe83] p-2 rounded-md transition-all duration-200 hover:scale-110"
@@ -96,14 +89,12 @@ onMounted(() => {
           </button>
         </div>
         
-        <!-- Camera Info -->
         <div class="camera-info">
           <div class="camera-details">
             <h2 class="camera-name">{{ cameraName }}</h2>
             <p class="camera-time">Current Time: {{ currentTime }}</p>
           </div>
           
-          <!-- Controls -->
           <div class="camera-controls">
             <button class="control-btn settings-btn">
               Settings
@@ -115,7 +106,6 @@ onMounted(() => {
         </div>
       </div>
       
-      <!-- Sidebar - Recent Events (Big Side Menu) -->
       <div class="events-sidebar">
         <div class="events-container">
           <h2 class="events-title">Recent Events</h2>
@@ -177,7 +167,6 @@ onMounted(() => {
   max-width: 100%;
 }
 
-/* Video Section - Takes 75% width */
 .video-section {
   flex: 1;
   width: 75%;
@@ -252,7 +241,6 @@ onMounted(() => {
   background-color: #2d2f31;
 }
 
-/* Events Sidebar - Takes 25% width, fixed height */
 .events-sidebar {
   width: 25%;
   min-width: 18.75rem;
@@ -368,7 +356,6 @@ onMounted(() => {
   justify-content: center;
 }
 
-/* Pulse animation for live indicator */
 @keyframes pulse {
   0%, 100% {
     opacity: 1;
@@ -382,7 +369,6 @@ onMounted(() => {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* Responsive adjustments */
 @media (max-width: 75rem) {
   .live-content-wrapper {
     flex-direction: column;

@@ -26,7 +26,6 @@ const formatDate = (dateString) => {
 
 onMounted(() => {
   fetchLogs();
-  // Refresh every 10 seconds
   setInterval(fetchLogs, 10000);
 });
 </script>
@@ -70,7 +69,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-/* Custom scrollbar for the table container */
 div::-webkit-scrollbar {
   height: 8px;
 }
