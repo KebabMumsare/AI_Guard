@@ -1,12 +1,12 @@
 import db from './database.js';
 
 const sampleLogs = [
-    { event_type: 'Person Detected', description: 'Person identified as Alice', camera_id: 'CAM-01' },
-    { event_type: 'Unknown Object', description: 'Unidentified object in sector 4', camera_id: 'CAM-02' },
+    { event_type: 'Food Detected', description: 'Detected food: McDonalds', camera_id: 'CAM-01' },
+    { event_type: 'Unknown Object', description: 'Unidentified object in sector 4', camera_id: 'CAM-01' },
     { event_type: 'Motion Detected', description: 'Movement near entrance', camera_id: 'CAM-01' },
     { event_type: 'System Startup', description: 'AI Guard system initialized', camera_id: 'SYSTEM' },
-    { event_type: 'Person Detected', description: 'Person identified as Bob', camera_id: 'CAM-03' },
-    { event_type: 'Alert', description: 'Restricted area access attempt', camera_id: 'CAM-02' },
+    { event_type: 'Person Detected', description: 'Person identified as Bob', camera_id: 'CAM-01' },
+    { event_type: 'Alert', description: 'Restricted area access attempt', camera_id: 'CAM-01' },
     { event_type: 'Person Detected', description: 'Person identified as Charlie', camera_id: 'CAM-01' }
 ];
 
