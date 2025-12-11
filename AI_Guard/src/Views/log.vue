@@ -1,13 +1,16 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 
-const logs = ref([]);
-const loading = ref(true);
-const error = ref(null);
+// State variables
+const logs = ref([]); // Stores the list of logs
+const loading = ref(true); // Shows loading text while fetching
+const error = ref(null); // Stores any error message
 
+// Function to fetch logs from the backend API
 const fetchLogs = async () => {
   loading.value = true;
   try {
+    // We use a relative path '/api/logs' so it works both locally (via proxy) and on the Pi (via Nginx)
     const response = await fetch('/api/logs');
     if (!response.ok) throw new Error('Failed to fetch logs');
     const data = await response.json();
@@ -20,13 +23,15 @@ const fetchLogs = async () => {
   }
 };
 
+// Helper to format the date nicely
 const formatDate = (dateString) => {
   return new Date(dateString).toLocaleString();
 };
 
+// When the component loads...
 onMounted(() => {
-  fetchLogs();
-  setInterval(fetchLogs, 10000);
+  fetchLogs(); // Fetch immediately
+  setInterval(fetchLogs, 10000); // And then refresh every 10 seconds
 });
 </script>
 

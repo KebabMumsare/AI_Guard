@@ -15,8 +15,12 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
+  // Server configuration for local development
   server: {
     proxy: {
+      // Proxy requests starting with '/api' to the backend server
+      // This allows us to use relative paths (e.g. fetch('/api/logs')) in the frontend
+      // which works seamlessly both locally and on the Pi (via Nginx)
       '/api': {
         target: 'http://localhost:3000',
         changeOrigin: true,

@@ -5,10 +5,15 @@ import db from './database.js';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
-app.use(express.json());
+// Middleware
+app.use(cors()); // Allow requests from other domains (like the frontend)
+app.use(express.json()); // Parse incoming JSON data
 
-// Endpoint to log an event (from Camera/Jetson)
+// --- API Endpoints ---
+
+// 1. Log an Event
+// Receives data from the Camera/Jetson Nano and saves it to the database.
+// Expected body: { event_type: "Person Detected", description: "...", camera_id: "..." }
 app.post('/api/log', (req, res) => {
     const { event_type, description, camera_id } = req.body;
 
@@ -32,7 +37,8 @@ app.post('/api/log', (req, res) => {
     });
 });
 
-// Endpoint to get all logs
+// 2. Get All Logs
+// Fetches the most recent 100 logs to display on the Log page.
 app.get('/api/logs', (req, res) => {
     const sql = `SELECT * FROM logs ORDER BY timestamp DESC LIMIT 100`;
     db.all(sql, [], (err, rows) => {
@@ -44,10 +50,10 @@ app.get('/api/logs', (req, res) => {
     });
 });
 
-// Endpoint to get stats for the graph (aggregated by day of week)
+// 3. Get Statistics (Graph Data)
+// Aggregates logs by day of the week for the Graph page.
 app.get('/api/stats', (req, res) => {
-    // SQLite query to count events per day of the week
-    // strftime('%w', timestamp) returns 0-6 (Sunday-Saturday)
+    // Get logs from the last 7 days
     const sql = `
     SELECT 
       strftime('%w', timestamp) as day_index,
