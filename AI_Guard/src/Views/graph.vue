@@ -291,6 +291,10 @@ onUnmounted(() => {
 
 .log-table tbody tr:hover {
   background-color: rgba(143, 254, 131, 0.1);
+  -webkit-transition: background-color 0.2s;
+  -moz-transition: background-color 0.2s;
+  -ms-transition: background-color 0.2s;
+  -o-transition: background-color 0.2s;
   transition: background-color 0.2s;
 }
 
@@ -351,6 +355,10 @@ onUnmounted(() => {
   border-radius: 4px;
   cursor: pointer;
   font-size: clamp(0.7rem, 1.2vw, 0.875rem);
+  -webkit-transition: background-color 0.2s;
+  -moz-transition: background-color 0.2s;
+  -ms-transition: background-color 0.2s;
+  -o-transition: background-color 0.2s;
   transition: background-color 0.2s;
   white-space: nowrap;
 }
@@ -371,6 +379,42 @@ onUnmounted(() => {
   white-space: nowrap;
 }
 
+@-webkit-keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@-moz-keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@-ms-keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@-o-keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
 @keyframes pulse {
   0%, 100% {
     opacity: 1;
@@ -381,7 +425,14 @@ onUnmounted(() => {
 }
 
 .animate-pulse {
+  -webkit-animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  -moz-animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  -ms-animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  -o-animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  will-change: opacity;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 /* Medium screens - make sidebar slimmer */

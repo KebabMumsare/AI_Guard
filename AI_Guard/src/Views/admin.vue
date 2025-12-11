@@ -338,6 +338,10 @@ const selectSection = (sectionId) => {
   color: #9ca3af;
   font-size: 1.2rem;
   cursor: pointer;
+  -webkit-transition: all 0.2s;
+  -moz-transition: all 0.2s;
+  -ms-transition: all 0.2s;
+  -o-transition: all 0.2s;
   transition: all 0.2s;
   border-left: 0.3rem solid transparent;
 }
@@ -477,6 +481,10 @@ const selectSection = (sectionId) => {
   right: 0;
   bottom: 0;
   background-color: #cbd5e1;
+  -webkit-transition: 0.3s;
+  -moz-transition: 0.3s;
+  -ms-transition: 0.3s;
+  -o-transition: 0.3s;
   transition: 0.3s;
   border-radius: 1.5rem;
 }
@@ -489,6 +497,10 @@ const selectSection = (sectionId) => {
   left: 0.3rem;
   bottom: 0.3rem;
   background-color: white;
+  -webkit-transition: 0.3s;
+  -moz-transition: 0.3s;
+  -ms-transition: 0.3s;
+  -o-transition: 0.3s;
   transition: 0.3s;
   border-radius: 50%;
 }
@@ -539,6 +551,10 @@ input:checked + .toggle-slider:before {
   font-size: 1.2rem;
   font-weight: 600;
   cursor: pointer;
+  -webkit-transition: all 0.2s;
+  -moz-transition: all 0.2s;
+  -ms-transition: all 0.2s;
+  -o-transition: all 0.2s;
   transition: all 0.2s;
   width: fit-content;
 }
@@ -582,6 +598,10 @@ input:checked + .toggle-slider:before {
   font-family: monospace;
   letter-spacing: 0.2em;
   text-align: center;
+  -webkit-transition: all 0.2s;
+  -moz-transition: all 0.2s;
+  -ms-transition: all 0.2s;
+  -o-transition: all 0.2s;
   transition: all 0.2s;
   user-select: none;
   width: 100%;
@@ -628,6 +648,10 @@ input:checked + .toggle-slider:before {
   position: fixed;
   pointer-events: none;
   z-index: 9999;
+  -webkit-transition: left 0.05s linear, top 0.05s linear;
+  -moz-transition: left 0.05s linear, top 0.05s linear;
+  -ms-transition: left 0.05s linear, top 0.05s linear;
+  -o-transition: left 0.05s linear, top 0.05s linear;
   transition: left 0.05s linear, top 0.05s linear;
   filter: drop-shadow(0 0.2rem 0.3rem rgba(0, 0, 0, 0.5));
   user-select: none;

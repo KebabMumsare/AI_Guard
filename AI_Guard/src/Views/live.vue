@@ -217,6 +217,10 @@ onMounted(() => {
   border-radius: 0.375rem;
   font-size: 0.875rem;
   font-weight: 600;
+  -webkit-transition: all 0.2s;
+  -moz-transition: all 0.2s;
+  -ms-transition: all 0.2s;
+  -o-transition: all 0.2s;
   transition: all 0.2s;
   cursor: pointer;
   border: none;
@@ -313,6 +317,10 @@ onMounted(() => {
   border: 2px solid rgba(143, 254, 131, 0.2);
   margin-bottom: 0.9375rem;
   position: relative;
+  -webkit-transition: all 0.2s ease;
+  -moz-transition: all 0.2s ease;
+  -ms-transition: all 0.2s ease;
+  -o-transition: all 0.2s ease;
   transition: all 0.2s ease;
   cursor: pointer;
 }
@@ -356,6 +364,42 @@ onMounted(() => {
   justify-content: center;
 }
 
+@-webkit-keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@-moz-keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@-ms-keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@-o-keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
 @keyframes pulse {
   0%, 100% {
     opacity: 1;
@@ -366,7 +410,14 @@ onMounted(() => {
 }
 
 .animate-pulse {
+  -webkit-animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  -moz-animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  -ms-animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  -o-animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  will-change: opacity;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 @media (max-width: 75rem) {

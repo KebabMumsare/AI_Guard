@@ -299,8 +299,15 @@ const getLabel = (item) => {
   font-size: clamp(0.75rem, 1.4vw, 14px);
   font-weight: 600;
   cursor: pointer;
+  -webkit-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -ms-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
   transition: all 0.3s ease;
   white-space: nowrap;
+  will-change: transform, background-color, border-color;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 .event-badge:hover {
@@ -396,9 +403,16 @@ const getLabel = (item) => {
   justify-content: center;
   padding-top: clamp(0.3rem, 0.6vh, 6px);
   position: relative;
+  -webkit-transition: all 0.3s ease;
+  -moz-transition: all 0.3s ease;
+  -ms-transition: all 0.3s ease;
+  -o-transition: all 0.3s ease;
   transition: all 0.3s ease;
   cursor: pointer;
   box-shadow: 0 clamp(1px, 0.2vh, 2px) clamp(2px, 0.4vh, 4px) rgba(0, 0, 0, 0.2);
+  will-change: transform, background;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 .bar:hover {
@@ -423,8 +437,51 @@ const getLabel = (item) => {
   background: #06B48B;
   clip-path: polygon(50% 0%, 61.8% 38.2%, 100% 50%, 61.8% 61.8%, 50% 100%, 38.2% 61.8%, 0% 50%, 38.2% 38.2%);
   z-index: 5;
+  -webkit-animation: pulse-brightness 2s ease-in-out infinite;
+  -moz-animation: pulse-brightness 2s ease-in-out infinite;
+  -ms-animation: pulse-brightness 2s ease-in-out infinite;
+  -o-animation: pulse-brightness 2s ease-in-out infinite;
   animation: pulse-brightness 2s ease-in-out infinite;
   pointer-events: none;
+  will-change: opacity;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+@-webkit-keyframes pulse-brightness {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+
+@-moz-keyframes pulse-brightness {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+
+@-ms-keyframes pulse-brightness {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+
+@-o-keyframes pulse-brightness {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
 }
 
 @keyframes pulse-brightness {
@@ -442,9 +499,20 @@ const getLabel = (item) => {
   left: 50%;
   width: clamp(24px, 3.6vw, 36px);
   clip-path: polygon(50% 0%, 61.8% 38.2%, 100% 50%, 61.8% 61.8%, 50% 100%, 38.2% 61.8%, 0% 50%, 38.2% 38.2%);
-  transform: translate(-50%, -50%);
+  -webkit-transform: translate3d(-50%, -50%, 0);
+  -moz-transform: translate3d(-50%, -50%, 0);
+  -ms-transform: translate3d(-50%, -50%, 0);
+  -o-transform: translate3d(-50%, -50%, 0);
+  transform: translate3d(-50%, -50%, 0);
+  -webkit-animation: pulse-brightness 2s ease-in-out infinite;
+  -moz-animation: pulse-brightness 2s ease-in-out infinite;
+  -ms-animation: pulse-brightness 2s ease-in-out infinite;
+  -o-animation: pulse-brightness 2s ease-in-out infinite;
   animation: pulse-brightness 2s ease-in-out infinite;
   pointer-events: none;
+  will-change: opacity;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 .star-glow-1 {
@@ -493,7 +561,11 @@ const getLabel = (item) => {
 
 .bar-current:hover {
   background: linear-gradient(to top, #6fba67, #8fef84, #afffa3) !important;
-  transform: translateY(-2px);
+  -webkit-transform: translate3d(0, -2px, 0);
+  -moz-transform: translate3d(0, -2px, 0);
+  -ms-transform: translate3d(0, -2px, 0);
+  -o-transform: translate3d(0, -2px, 0);
+  transform: translate3d(0, -2px, 0);
   box-shadow: 0 4px 8px rgba(143, 254, 131, 0.3);
 }
 
