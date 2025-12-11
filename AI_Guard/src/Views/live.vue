@@ -1,5 +1,6 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { gsap } from 'gsap'
 
 const isLive = ref(true)
 const isFullscreen = ref(false)
@@ -44,6 +45,34 @@ onMounted(() => {
   document.addEventListener('fullscreenchange', () => {
     isFullscreen.value = !!document.fullscreenElement
   })
+  
+  // Pulse animation for LIVE indicator
+  nextTick(() => {
+    const pulseElement = document.querySelector('.animate-pulse')
+    if (pulseElement) {
+      gsap.to(pulseElement, {
+        opacity: 0.5,
+        duration: 1,
+        repeat: -1,
+        yoyo: true,
+        ease: 'power1.inOut'
+      })
+    }
+  })
+  
+  // Also check after a short delay in case element isn't ready yet
+  setTimeout(() => {
+    const pulseElement = document.querySelector('.animate-pulse')
+    if (pulseElement && !gsap.isTweening(pulseElement)) {
+      gsap.to(pulseElement, {
+        opacity: 0.5,
+        duration: 1,
+        repeat: -1,
+        yoyo: true,
+        ease: 'power1.inOut'
+      })
+    }
+  }, 100)
 })
 </script>
 
@@ -364,60 +393,9 @@ onMounted(() => {
   justify-content: center;
 }
 
-@-webkit-keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-@-moz-keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-@-ms-keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-@-o-keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
+/* Pulse animation - Now handled by GSAP */
 .animate-pulse {
-  -webkit-animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  -moz-animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  -ms-animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  -o-animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  will-change: opacity;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
+  opacity: 1;
 }
 
 @media (max-width: 75rem) {

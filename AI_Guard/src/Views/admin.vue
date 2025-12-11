@@ -1,5 +1,6 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { gsap } from 'gsap'
 
 const activeSection = ref('status')
 const alarmEnabled = ref(true)
@@ -35,6 +36,20 @@ const handleGlobalMouseMove = (event) => {
     updateEyePosition(event)
   }
 }
+
+// Watch for IP reveal elements to animate them with GSAP
+watch([showJetsonIP, showRaspberryIP], () => {
+  nextTick(() => {
+    const revealElements = document.querySelectorAll('.ip-reveal')
+    revealElements.forEach((el) => {
+      gsap.from(el, {
+        opacity: 0,
+        duration: 0.3,
+        ease: 'power1.in'
+      })
+    })
+  })
+})
 
 onMounted(() => {
   document.addEventListener('mousemove', handleGlobalMouseMove)
@@ -617,12 +632,13 @@ input:checked + .toggle-slider:before {
   background-color: rgba(0, 0, 0, 0.4);
 }
 
+/* FadeIn animation - Now handled by GSAP */
 .ip-reveal {
   width: 100%;
-  animation: fadeIn 0.3s ease-in;
   cursor: pointer;
   position: relative;
   min-height: 3rem;
+  opacity: 1;
 }
 
 .ip-reveal .router-input {
@@ -633,15 +649,6 @@ input:checked + .toggle-slider:before {
 
 .ip-reveal:hover .router-input {
   border-color: rgba(143, 254, 131, 0.5);
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
 }
 
 .eye-icon {

@@ -1,5 +1,6 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, ref, watch, onMounted, nextTick } from 'vue'
+import { gsap } from 'gsap'
 
 const props = defineProps({
   events: {
@@ -154,6 +155,35 @@ const getLabel = (item) => {
   }
   return item.dayName
 }
+
+// Initialize GSAP pulse animations for star elements
+const initStarAnimations = () => {
+  setTimeout(() => {
+    const starGlowLayers = document.querySelectorAll('.star-glow-layer')
+    
+    // Animate star glow layers
+    starGlowLayers.forEach((layer) => {
+      // Kill any existing animation first
+      gsap.killTweensOf(layer)
+      gsap.to(layer, {
+        opacity: 0.2,
+        duration: 1,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut'
+      })
+    })
+  }, 100)
+}
+
+onMounted(() => {
+  initStarAnimations()
+  
+  // Watch for data changes to re-animate new stars
+  watch(() => [props.events, props.mode], () => {
+    initStarAnimations()
+  }, { deep: true })
+})
 </script>
 
 <template>
@@ -437,82 +467,20 @@ const getLabel = (item) => {
   background: #06B48B;
   clip-path: polygon(50% 0%, 61.8% 38.2%, 100% 50%, 61.8% 61.8%, 50% 100%, 38.2% 61.8%, 0% 50%, 38.2% 38.2%);
   z-index: 5;
-  -webkit-animation: pulse-brightness 2s ease-in-out infinite;
-  -moz-animation: pulse-brightness 2s ease-in-out infinite;
-  -ms-animation: pulse-brightness 2s ease-in-out infinite;
-  -o-animation: pulse-brightness 2s ease-in-out infinite;
-  animation: pulse-brightness 2s ease-in-out infinite;
   pointer-events: none;
-  will-change: opacity;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
+  opacity: 1;
 }
 
-@-webkit-keyframes pulse-brightness {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.2;
-  }
-}
-
-@-moz-keyframes pulse-brightness {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.2;
-  }
-}
-
-@-ms-keyframes pulse-brightness {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.2;
-  }
-}
-
-@-o-keyframes pulse-brightness {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.2;
-  }
-}
-
-@keyframes pulse-brightness {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.2;
-  }
-}
-
+/* Pulse-brightness animation - Now handled by GSAP */
 .star-glow-layer {
   position: absolute;
   top: clamp(-6px, -0.9vh, -9px);
   left: 50%;
   width: clamp(24px, 3.6vw, 36px);
   clip-path: polygon(50% 0%, 61.8% 38.2%, 100% 50%, 61.8% 61.8%, 50% 100%, 38.2% 61.8%, 0% 50%, 38.2% 38.2%);
-  -webkit-transform: translate3d(-50%, -50%, 0);
-  -moz-transform: translate3d(-50%, -50%, 0);
-  -ms-transform: translate3d(-50%, -50%, 0);
-  -o-transform: translate3d(-50%, -50%, 0);
   transform: translate3d(-50%, -50%, 0);
-  -webkit-animation: pulse-brightness 2s ease-in-out infinite;
-  -moz-animation: pulse-brightness 2s ease-in-out infinite;
-  -ms-animation: pulse-brightness 2s ease-in-out infinite;
-  -o-animation: pulse-brightness 2s ease-in-out infinite;
-  animation: pulse-brightness 2s ease-in-out infinite;
   pointer-events: none;
-  will-change: opacity;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
+  opacity: 1;
 }
 
 .star-glow-1 {

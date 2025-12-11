@@ -1,5 +1,6 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { gsap } from 'gsap'
 import BlockGraph from '../components/BlockGraph.vue'
 import mockData from '../data/mockData.json'
 
@@ -57,6 +58,35 @@ const formatDate = (dateString) => {
   return new Date(dateString).toLocaleString()
 }
 
+// Pulse animation for loading state
+let pulseAnimation = null
+
+watch(loading, (isLoading) => {
+  if (isLoading) {
+    nextTick(() => {
+      const pulseElement = document.querySelector('.log-status.animate-pulse')
+      if (pulseElement) {
+        // Kill any existing animation first
+        if (pulseAnimation) {
+          pulseAnimation.kill()
+        }
+        pulseAnimation = gsap.to(pulseElement, {
+          opacity: 0.5,
+          duration: 1,
+          repeat: -1,
+          yoyo: true,
+          ease: 'power1.inOut'
+        })
+      }
+    })
+  } else {
+    if (pulseAnimation) {
+      pulseAnimation.kill()
+      pulseAnimation = null
+    }
+  }
+}, { immediate: true })
+
 // When the component loads...
 onMounted(() => {
   fetchLogs(currentPage.value)
@@ -66,6 +96,9 @@ onMounted(() => {
 
 onUnmounted(() => {
   if (intervalId) clearInterval(intervalId)
+  if (pulseAnimation) {
+    pulseAnimation.kill()
+  }
 })
 </script>
 
@@ -379,60 +412,9 @@ onUnmounted(() => {
   white-space: nowrap;
 }
 
-@-webkit-keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-@-moz-keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-@-ms-keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-@-o-keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
+/* Pulse animation - Now handled by GSAP */
 .animate-pulse {
-  -webkit-animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  -moz-animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  -ms-animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  -o-animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  will-change: opacity;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
+  opacity: 1;
 }
 
 /* Medium screens - make sidebar slimmer */
