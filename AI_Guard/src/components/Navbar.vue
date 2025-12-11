@@ -7,8 +7,6 @@
     <router-link to="/home" class="nav-link">Home</router-link>
     <span class="separator">|</span>
     <router-link to="/live" class="nav-link">Live</router-link>
-    <span class="separator">|</span>
-    <router-link to="/log" class="nav-link">Log</router-link>
   </nav>
 </template>
 

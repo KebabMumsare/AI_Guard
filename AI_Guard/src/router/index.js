@@ -2,7 +2,6 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Admin from '../Views/admin.vue'
 import Graph from '../Views/graph.vue'
 import Live from '../Views/live.vue'
-import Log from '../Views/log.vue'
 import Home from '../Views/home.vue'
 
 const routes = [
@@ -25,11 +24,6 @@ const routes = [
     path: '/live',
     name: 'Live',
     component: Live
-  },
-  {
-    path: '/log',
-    name: 'Log',
-    component: Log
   },
   {
     path: '/home',
