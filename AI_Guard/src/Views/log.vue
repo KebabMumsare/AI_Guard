@@ -2,24 +2,49 @@
 import { ref, onMounted } from 'vue';
 
 // State variables
-const logs = ref([]); // Stores the list of logs
-const loading = ref(true); // Shows loading text while fetching
-const error = ref(null); // Stores any error message
+const logs = ref([]); 
+const loading = ref(true);
+const error = ref(null);
+
+// Pagination state
+const currentPage = ref(1);
+const totalPages = ref(1);
+const limit = 20; // Items per page
 
 // Function to fetch logs from the backend API
-const fetchLogs = async () => {
+const fetchLogs = async (page = 1) => {
   loading.value = true;
   try {
-    // We use a relative path '/api/logs' so it works both locally (via proxy) and on the Pi (via Nginx)
-    const response = await fetch('/api/logs');
+    // Pass page and limit to the API
+    const response = await fetch(`/api/logs?page=${page}&limit=${limit}`);
     if (!response.ok) throw new Error('Failed to fetch logs');
+    
     const data = await response.json();
     logs.value = data.logs;
+    
+    // Update pagination info
+    if (data.pagination) {
+      currentPage.value = data.pagination.page;
+      totalPages.value = data.pagination.totalPages;
+    }
   } catch (err) {
     console.error('Error fetching logs:', err);
     error.value = 'Failed to load logs. Please ensure the backend is running.';
   } finally {
     loading.value = false;
+  }
+};
+
+// Navigation functions
+const nextPage = () => {
+  if (currentPage.value < totalPages.value) {
+    fetchLogs(currentPage.value + 1);
+  }
+};
+
+const prevPage = () => {
+  if (currentPage.value > 1) {
+    fetchLogs(currentPage.value - 1);
   }
 };
 
@@ -30,8 +55,9 @@ const formatDate = (dateString) => {
 
 // When the component loads...
 onMounted(() => {
-  fetchLogs(); // Fetch immediately
-  setInterval(fetchLogs, 10000); // And then refresh every 10 seconds
+  fetchLogs(currentPage.value);
+  // Refresh current page every 10 seconds
+  setInterval(() => fetchLogs(currentPage.value), 10000);
 });
 </script>
 
@@ -69,6 +95,29 @@ onMounted(() => {
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div v-if="!loading && !error && logs.length > 0" class="flex items-center justify-center gap-4 mt-6 w-full max-w-[95vw]">
+      <button 
+        @click="prevPage" 
+        :disabled="currentPage === 1"
+        class="px-4 py-2 bg-[#8ffe83] text-black font-bold rounded hover:bg-[#7ae570] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+      >
+        Previous
+      </button>
+      
+      <span class="text-[#8ffe83] font-medium">
+        Page {{ currentPage }} of {{ totalPages }}
+      </span>
+      
+      <button 
+        @click="nextPage" 
+        :disabled="currentPage === totalPages"
+        class="px-4 py-2 bg-[#8ffe83] text-black font-bold rounded hover:bg-[#7ae570] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+      >
+        Next
+      </button>
     </div>
   </div>
 </template>

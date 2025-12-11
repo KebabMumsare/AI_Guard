@@ -37,16 +37,42 @@ app.post('/api/log', (req, res) => {
     });
 });
 
-// 2. Get All Logs
-// Fetches the most recent 100 logs to display on the Log page.
+// 2. Get All Logs (Paginated)
+// Fetches logs with pagination support.
+// Query params: ?page=1&limit=20
 app.get('/api/logs', (req, res) => {
-    const sql = `SELECT * FROM logs ORDER BY timestamp DESC LIMIT 100`;
-    db.all(sql, [], (err, rows) => {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const offset = (page - 1) * limit;
+
+    // First, get the total count of logs
+    db.get('SELECT COUNT(*) as count FROM logs', [], (err, row) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
         }
-        res.json({ logs: rows });
+
+        const totalLogs = row.count;
+        const totalPages = Math.ceil(totalLogs / limit);
+
+        // Then, get the actual logs for this page
+        const sql = `SELECT * FROM logs ORDER BY timestamp DESC LIMIT ? OFFSET ?`;
+        db.all(sql, [limit, offset], (err, rows) => {
+            if (err) {
+                res.status(500).json({ error: err.message });
+                return;
+            }
+
+            res.json({
+                logs: rows,
+                pagination: {
+                    page,
+                    limit,
+                    totalLogs,
+                    totalPages
+                }
+            });
+        });
     });
 });
 
@@ -69,18 +95,10 @@ app.get('/api/stats', (req, res) => {
             return;
         }
 
-        // Map 0-6 to Monday-Sunday format or whatever the frontend expects
-        // Frontend expects: Monday, Tuesday, Wednesday, Thursday, Friday
-        // Let's format it for the frontend
+        // Map 0-6 to Monday-Sunday format
         const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         const stats = {
-            Monday: 0,
-            Tuesday: 0,
-            Wednesday: 0,
-            Thursday: 0,
-            Friday: 0,
-            Saturday: 0,
-            Sunday: 0
+            Monday: 0, Tuesday: 0, Wednesday: 0, Thursday: 0, Friday: 0, Saturday: 0, Sunday: 0
         };
 
         rows.forEach(row => {
@@ -94,6 +112,7 @@ app.get('/api/stats', (req, res) => {
     });
 });
 
+// Start the server
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
