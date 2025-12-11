@@ -116,7 +116,12 @@ onUnmounted(() => {
       
       <div class="sidebar-section">
         <div class="log-container">
-          <h2 class="log-title">Event Logs</h2>
+          <div class="log-header">
+            <h2 class="log-title">Event Logs</h2>
+            <button @click="fetchLogs(currentPage)" class="refresh-btn" title="Refresh Logs">
+              ↻
+            </button>
+          </div>
           
           <div v-if="loading && logs.length === 0" class="log-status animate-pulse">
             Loading logs...
