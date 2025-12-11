@@ -9,7 +9,7 @@ const error = ref(null);
 // Pagination state
 const currentPage = ref(1);
 const totalPages = ref(1);
-const limit = 20; // Items per page
+const limit = 15; // Items per page
 
 // Function to fetch logs from the backend API
 const fetchLogs = async (page = 1) => {
