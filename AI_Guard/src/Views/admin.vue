@@ -1,6 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
-import { gsap } from 'gsap'
+import { ref, onMounted, onUnmounted } from 'vue'
 
 const activeSection = ref('status')
 const alarmEnabled = ref(true)
@@ -36,53 +35,6 @@ const handleGlobalMouseMove = (event) => {
     updateEyePosition(event)
   }
 }
-
-// Watch for IP reveal elements to animate them with GSAP
-watch([showJetsonIP, showRaspberryIP], () => {
-  // Check if GSAP is available
-  if (typeof gsap === 'undefined') {
-    console.error('[Admin] GSAP is not loaded!')
-    return
-  }
-
-  // Check for reduced motion preference
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  if (prefersReducedMotion) {
-    // If reduced motion, show elements immediately without animation
-    nextTick(() => {
-      try {
-        const revealElements = document.querySelectorAll('.ip-reveal')
-        revealElements.forEach((el) => {
-          gsap.set(el, { opacity: 1 })
-        })
-      } catch (error) {
-        console.warn('[Admin] Error setting static opacity for reduced motion:', error)
-      }
-    })
-    return
-  }
-
-  nextTick(() => {
-    try {
-      const revealElements = document.querySelectorAll('.ip-reveal')
-      revealElements.forEach((el) => {
-        try {
-          gsap.from(el, {
-            opacity: 0,
-            duration: 0.3,
-            ease: 'power1.in'
-          })
-        } catch (error) {
-          console.warn('[Admin] Error animating IP reveal element:', error)
-          // Fallback: show element immediately
-          gsap.set(el, { opacity: 1 })
-        }
-      })
-    } catch (error) {
-      console.error('[Admin] Error initializing IP reveal animations:', error)
-    }
-  })
-})
 
 onMounted(() => {
   document.addEventListener('mousemove', handleGlobalMouseMove)

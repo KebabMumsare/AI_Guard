@@ -6,7 +6,6 @@ import { gsap } from 'gsap'
 const router = useRouter()
 const connectionStatus = ref('online')
 
-// Template refs for animated elements
 const titleRef = ref(null)
 const textRef = ref(null)
 const createdRef = ref(null)
@@ -15,141 +14,43 @@ const buttonRef = ref(null)
 onMounted(() => {
   document.body.style.overflowY = 'hidden'
   
-  // Wait for DOM to be ready
   nextTick(() => {
-    // Check if GSAP is available
-    if (typeof gsap === 'undefined') {
-      console.error('GSAP is not loaded!')
-      // Fallback: show elements immediately
-      if (titleRef.value) titleRef.value.style.opacity = '1'
-      if (textRef.value) textRef.value.style.opacity = '1'
-      if (createdRef.value) createdRef.value.style.opacity = '1'
-      if (buttonRef.value) buttonRef.value.style.opacity = '1'
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    
+    if (prefersReducedMotion) {
+      [titleRef.value, textRef.value, createdRef.value, buttonRef.value].forEach(el => {
+        if (el) gsap.set(el, { opacity: 1, x: 0, y: 0 })
+      })
       return
     }
     
-    // Check for reduced motion preference
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    
-    if (!prefersReducedMotion) {
-      // Wave animations
-      const wave1 = document.querySelector('.wave-animation-1')
-      const wave2 = document.querySelector('.wave-animation-2')
-      const wave3 = document.querySelector('.wave-animation-3')
-      
-      if (wave1) {
-        gsap.to(wave1, {
-          x: '-4%',
-          y: -2,
-          scale: 1.12,
-          duration: 15,
-          repeat: -1,
-          yoyo: true,
-          ease: 'sine.inOut'
-        })
-      }
-      
-      if (wave2) {
-        gsap.to(wave2, {
-          x: '-4%',
-          y: -2,
-          scale: 1.12,
-          duration: 20,
-          repeat: -1,
-          yoyo: true,
-          ease: 'sine.inOut',
-          delay: -5
-        })
-      }
-      
-      if (wave3) {
-        gsap.to(wave3, {
-          x: '-4%',
-          y: -2,
-          scale: 1.12,
-          duration: 25,
-          repeat: -1,
-          yoyo: true,
-          ease: 'sine.inOut',
-          delay: -10
-        })
-      }
-      
-      // Fade-in animations using template refs
-      if (titleRef.value) {
-        gsap.fromTo(titleRef.value, 
-          { opacity: 0, y: 20 },
-          { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out', delay: 0 }
-        )
-      }
-      
-      if (textRef.value) {
-        gsap.fromTo(textRef.value,
-          { opacity: 0, y: 20 },
-          { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out', delay: 0.3 }
-        )
-      }
-      
-      if (createdRef.value) {
-        gsap.fromTo(createdRef.value,
-          { opacity: 0, y: 20 },
-          { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out', delay: 0.5 }
-        )
-      }
-      
-      if (buttonRef.value) {
-        gsap.fromTo(buttonRef.value,
-          { opacity: 0, x: -30 },
-          { opacity: 1, x: 0, duration: 0.8, ease: 'power2.out', delay: 0.7 }
-        )
-      }
-      
-      // Pulse animation for LIVE indicator
-      const pulseEl = document.querySelector('.animate-pulse')
-      if (pulseEl) {
-        gsap.to(pulseEl, {
-          opacity: 0.5,
-          duration: 1,
-          repeat: -1,
-          yoyo: true,
-          ease: 'power1.inOut'
-        })
-      }
-    } else {
-      // If reduced motion, just show elements immediately
-      if (titleRef.value) gsap.set(titleRef.value, { opacity: 1, x: 0, y: 0 })
-      if (textRef.value) gsap.set(textRef.value, { opacity: 1, x: 0, y: 0 })
-      if (createdRef.value) gsap.set(createdRef.value, { opacity: 1, x: 0, y: 0 })
-      if (buttonRef.value) gsap.set(buttonRef.value, { opacity: 1, x: 0, y: 0 })
+    if (titleRef.value) {
+      gsap.fromTo(titleRef.value, 
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }
+      )
     }
     
-    // Fallback: ensure elements are visible after 1.5 seconds if GSAP didn't work
-    setTimeout(() => {
-      if (titleRef.value) {
-        const computed = window.getComputedStyle(titleRef.value)
-        if (parseFloat(computed.opacity) < 0.1) {
-          gsap.set(titleRef.value, { opacity: 1, x: 0, y: 0 })
-        }
-      }
-      if (textRef.value) {
-        const computed = window.getComputedStyle(textRef.value)
-        if (parseFloat(computed.opacity) < 0.1) {
-          gsap.set(textRef.value, { opacity: 1, x: 0, y: 0 })
-        }
-      }
-      if (createdRef.value) {
-        const computed = window.getComputedStyle(createdRef.value)
-        if (parseFloat(computed.opacity) < 0.1) {
-          gsap.set(createdRef.value, { opacity: 1, x: 0, y: 0 })
-        }
-      }
-      if (buttonRef.value) {
-        const computed = window.getComputedStyle(buttonRef.value)
-        if (parseFloat(computed.opacity) < 0.1) {
-          gsap.set(buttonRef.value, { opacity: 1, x: 0, y: 0 })
-        }
-      }
-    }, 1500)
+    if (textRef.value) {
+      gsap.fromTo(textRef.value,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out', delay: 0.3 }
+      )
+    }
+    
+    if (createdRef.value) {
+      gsap.fromTo(createdRef.value,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out', delay: 0.5 }
+      )
+    }
+    
+    if (buttonRef.value) {
+      gsap.fromTo(buttonRef.value,
+        { opacity: 0, x: -30 },
+        { opacity: 1, x: 0, duration: 0.8, ease: 'power2.out', delay: 0.7 }
+      )
+    }
   })
 })
 
@@ -169,9 +70,9 @@ onUnmounted(() => {
     </div>
     
     <div class="flex flex-col flex-1 max-w-full lg:max-w-[90rem] relative z-10 mb-2 sm:mb-3 md:mb-4 lg:mb-0">
-      <h1 ref="titleRef" class="text-[#8ffe83] text-xl sm:text-2xl md:text-3xl lg:text-6xl xl:text-8xl 2xl:text-9xl font-bold mb-0.5 sm:mb-1 md:mb-2 lg:mb-3 animate-title">Welcome!</h1>
-      <p ref="textRef" class="text-[#8ffe83] text-[10px] sm:text-xs md:text-sm lg:text-lg xl:text-xl 2xl:text-2xl max-w-full lg:max-w-3xl leading-tight sm:leading-tight md:leading-snug lg:leading-relaxed mb-0.5 sm:mb-1 animate-text">This is an AI system that uses cameras to detect different instances of events and show them in a graph as well as logging them into a database. The system provides real-time monitoring and analysis of various events captured through camera feeds, allowing you to visualize patterns and trends through interactive graphs. All detected events are automatically logged into a comprehensive database for historical analysis and reporting. Navigate through the dashboard to explore live camera feeds, view detailed event graphs, and access the complete event log.</p>
-      <div ref="createdRef" class="flex flex-row flex-wrap gap-0.5 sm:gap-1 md:gap-2 content-row mb-0.5 sm:mb-1 animate-created">
+      <h1 ref="titleRef" class="text-[#8ffe83] text-xl sm:text-2xl md:text-3xl lg:text-6xl xl:text-8xl 2xl:text-9xl font-bold mb-0.5 sm:mb-1 md:mb-2 lg:mb-3">Welcome!</h1>
+      <p ref="textRef" class="text-[#8ffe83] text-[10px] sm:text-xs md:text-sm lg:text-lg xl:text-xl 2xl:text-2xl max-w-full lg:max-w-3xl leading-tight sm:leading-tight md:leading-snug lg:leading-relaxed mb-0.5 sm:mb-1">This is an AI system that uses cameras to detect different instances of events and show them in a graph as well as logging them into a database. The system provides real-time monitoring and analysis of various events captured through camera feeds, allowing you to visualize patterns and trends through interactive graphs. All detected events are automatically logged into a comprehensive database for historical analysis and reporting. Navigate through the dashboard to explore live camera feeds, view detailed event graphs, and access the complete event log.</p>
+      <div ref="createdRef" class="flex flex-row flex-wrap gap-0.5 sm:gap-1 md:gap-2 content-row mb-0.5 sm:mb-1">
         <p class="text-[#8ffe83] text-[10px] sm:text-xs md:text-sm lg:text-lg xl:text-xl 2xl:text-2xl max-w-full">Created by:</p>
         <a href="https://github.com/Mykyta-G" class="text-[#8ffe83] text-[10px] sm:text-xs md:text-sm lg:text-lg xl:text-xl 2xl:text-2xl max-w-full link-hover-glow">Mykyta-G,</a>
         <a href="https://github.com/eliahdim" class="text-[#8ffe83] text-[10px] sm:text-xs md:text-sm lg:text-lg xl:text-xl 2xl:text-2xl max-w-full link-hover-glow">Eliah-D,</a>
@@ -179,7 +80,7 @@ onUnmounted(() => {
         <a href="https://github.com/andigj" class="text-[#8ffe83] text-[10px] sm:text-xs md:text-sm lg:text-lg xl:text-xl 2xl:text-2xl max-w-full link-hover-glow">Andi-G &</a>
         <a href="https://github.com/kebabmumsare" class="text-[#8ffe83] text-[10px] sm:text-xs md:text-sm lg:text-lg xl:text-xl 2xl:text-2xl max-w-full link-hover-glow">Jesper-A</a>
       </div>
-      <button ref="buttonRef" @click="router.push('/live')" class="bg-[#8ffe83] text-black p-1 sm:p-1.5 md:p-2 lg:p-3 rounded-md mt-0.5 sm:mt-1 md:mt-2 lg:mt-3 w-fit text-[10px] sm:text-xs md:text-sm lg:text-base xl:text-lg animate-button button-hover-glow button-press">Go to Dashboard</button>
+      <button ref="buttonRef" @click="router.push('/live')" class="bg-[#8ffe83] text-black p-1 sm:p-1.5 md:p-2 lg:p-3 rounded-md mt-0.5 sm:mt-1 md:mt-2 lg:mt-3 w-fit text-[10px] sm:text-xs md:text-sm lg:text-base xl:text-lg button-hover-glow button-press">Go to Dashboard</button>
     </div>
     <div class="h-[20vh] sm:h-[25vh] md:h-[30vh] lg:h-[50vh] w-full sm:w-[85%] md:w-[75%] lg:w-[60vh] xl:w-[60vh] bg-black rounded-md overflow-hidden flex-shrink-0 relative z-10 mx-auto lg:mx-0">
       <div class="w-full h-full flex items-center justify-center bg-black">
@@ -239,26 +140,6 @@ onUnmounted(() => {
   transform: translate3d(0, 0, 0) scale(1.1);
 }
 
-/* Fade-in animations - Initial state for GSAP */
-.animate-title {
-  opacity: 0;
-  transform: translate3d(0, 20px, 0);
-}
-
-.animate-text {
-  opacity: 0;
-  transform: translate3d(0, 20px, 0);
-}
-
-.animate-created {
-  opacity: 0;
-  transform: translate3d(0, 20px, 0);
-}
-
-.animate-button {
-  opacity: 0;
-  transform: translate3d(-30px, 0, 0);
-}
 
 .button-hover-glow {
   -webkit-transition: all 0.3s ease;

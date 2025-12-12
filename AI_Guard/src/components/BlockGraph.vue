@@ -14,33 +14,26 @@ const props = defineProps({
   }
 })
 
-// Get unique event types from the events
 const eventTypes = computed(() => {
   const unique = [...new Set(props.events.map(e => e.eventName))]
   return unique.sort()
 })
 
-// Selected event (defaults to first event type) - only used in 'filtered' mode
-// 'TOTAL' is a special value that means show all events combined
 const selectedEvent = ref('')
 
-// Initialize selectedEvent when eventTypes are available
 watch(eventTypes, (newTypes) => {
   if (newTypes.length > 0 && !newTypes.includes(selectedEvent.value) && selectedEvent.value !== 'TOTAL') {
     selectedEvent.value = newTypes[0]
   }
 }, { immediate: true })
 
-// Check if showing total events
 const isTotalEvents = computed(() => selectedEvent.value === 'TOTAL')
 
-// Get current week structure (Monday to Sunday)
 const getCurrentWeek = () => {
   const today = new Date()
   const day = today.getDay()
-  // Get Monday of current week (day 0 = Sunday, so we adjust)
   const monday = new Date(today)
-  const diff = day === 0 ? -6 : 1 - day // If Sunday, go back 6 days, otherwise go to Monday
+  const diff = day === 0 ? -6 : 1 - day
   monday.setDate(today.getDate() + diff)
   monday.setHours(0, 0, 0, 0)
   
@@ -62,10 +55,8 @@ const getCurrentWeek = () => {
   return week
 }
 
-// Process event data based on mode
 const data = computed(() => {
   if (props.mode === 'highscores') {
-    // Calculate total counts per event type
     const eventCounts = {}
     props.events.forEach(event => {
       if (!eventCounts[event.eventName]) {
@@ -74,14 +65,12 @@ const data = computed(() => {
       eventCounts[event.eventName]++
     })
     
-    // Convert to array and sort by count (descending)
     return eventTypes.value.map(eventType => ({
       label: eventType,
       count: eventCounts[eventType] || 0
     })).sort((a, b) => b.count - a.count)
   }
   
-  // For 'total' and 'filtered' modes, show weekly data
   const eventsToProcess = props.mode === 'total' || (props.mode === 'filtered' && isTotalEvents.value)
     ? props.events 
     : props.events.filter(e => e.eventName === selectedEvent.value)
@@ -100,10 +89,8 @@ const data = computed(() => {
     groupedByDate[dateKey].count++
   })
   
-  // Get current week structure
   const currentWeek = getCurrentWeek()
   
-  // Fill in counts for each day of the week
   currentWeek.forEach(day => {
     day.count = groupedByDate[day.date]?.count || 0
   })
@@ -111,7 +98,6 @@ const data = computed(() => {
   return currentWeek
 })
 
-// Max value is the highest bar + 10, rounded to nearest 10
 const maxValue = computed(() => {
   if (data.value.length === 0) return 10
   const max = Math.max(...data.value.map(d => d.count), 0)
@@ -119,27 +105,22 @@ const maxValue = computed(() => {
   return Math.round(valueWithPadding / 10) * 10 || 10
 })
 
-// Y-axis values at every 20% of maxValue
 const yAxisValues = computed(() => {
   const max = maxValue.value
-  const step = max * 0.2 // 20% of max
+  const step = max * 0.2
   const values = []
   
-  // 0 to max at 20% intervals on Y-axis
   for (let i = 0; i <= max; i += step) {
     values.push(Math.round(i))
   }
   
-  // Ensure max is included on da Y-axis
   if (values[values.length - 1] !== max) {
     values.push(max)
   }
   
-  // Return in descending order to display the y-axis
   return values.reverse()
 })
 
-// Check if a day is today (only for weekly view)
 const isCurrentDay = (dayName) => {
   if (props.mode === 'highscores') return false
   const today = new Date()
@@ -148,7 +129,6 @@ const isCurrentDay = (dayName) => {
   return dayName === todayName
 }
 
-// Get label for display
 const getLabel = (item) => {
   if (props.mode === 'highscores') {
     return item.label
@@ -156,110 +136,38 @@ const getLabel = (item) => {
   return item.dayName
 }
 
-// Initialize GSAP pulse animations for star elements
-const initStarAnimations = (retryCount = 0, maxRetries = 3) => {
-  // Check if GSAP is available
-  if (typeof gsap === 'undefined') {
-    console.error('[BlockGraph] GSAP is not loaded!')
-    return
-  }
-
-  // Check for reduced motion preference
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  if (prefersReducedMotion) {
-    // If reduced motion, set static opacity instead of animating
-    nextTick(() => {
-      try {
-        const starGlowLayers = document.querySelectorAll('.star-glow-layer')
-        const barCurrents = document.querySelectorAll('.bar-current')
-        starGlowLayers.forEach((layer) => {
-          gsap.set(layer, { opacity: 0.5 })
-        })
-        barCurrents.forEach((bar) => {
-          const centerStar = bar.querySelector('.center-star')
-          if (centerStar) {
-            gsap.set(centerStar, { opacity: 0.5 })
-          }
-        })
-      } catch (error) {
-        console.warn('[BlockGraph] Error setting static opacity for reduced motion:', error)
-      }
-    })
-    return
-  }
-
-  // Use nextTick to ensure DOM is ready
+const initStarAnimations = () => {
   nextTick(() => {
-    try {
-      const starGlowLayers = document.querySelectorAll('.star-glow-layer')
-      const barCurrents = document.querySelectorAll('.bar-current')
-      
-      if (starGlowLayers.length === 0 && barCurrents.length === 0) {
-        // No elements found, retry if attempts remain
-        if (retryCount < maxRetries) {
-          setTimeout(() => {
-            initStarAnimations(retryCount + 1, maxRetries)
-          }, 150 * (retryCount + 1)) // Exponential backoff
-        }
-        return
-      }
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    
+    if (prefersReducedMotion) {
+      return
+    }
 
-      // Animate star glow layers
-      starGlowLayers.forEach((layer) => {
-        try {
-          // Kill any existing animation first
-          gsap.killTweensOf(layer)
-          gsap.to(layer, {
-            opacity: 0.2,
-            duration: 1,
-            repeat: -1,
-            yoyo: true,
-            ease: 'sine.inOut'
-          })
-        } catch (error) {
-          console.warn('[BlockGraph] Error animating star layer:', error)
-        }
+    const starElements = document.querySelectorAll('.star-glow-layer, .center-star')
+    
+    if (starElements.length > 0) {
+      gsap.to(starElements, {
+        opacity: 0.2,
+        duration: 1,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut'
       })
-      
-      // Animate the center star element directly (more compatible than CSS custom properties)
-      barCurrents.forEach((bar) => {
-        try {
-          // Find the center star element inside the bar
-          const centerStar = bar.querySelector('.center-star')
-          if (centerStar) {
-            gsap.killTweensOf(centerStar)
-            gsap.to(centerStar, {
-              opacity: 0.2,
-              duration: 1,
-              repeat: -1,
-              yoyo: true,
-              ease: 'sine.inOut'
-            })
-          }
-        } catch (error) {
-          console.warn('[BlockGraph] Error animating center star:', error)
-        }
-      })
-    } catch (error) {
-      console.error('[BlockGraph] Error initializing star animations:', error)
-      // Retry if attempts remain
-      if (retryCount < maxRetries) {
-        setTimeout(() => {
-          initStarAnimations(retryCount + 1, maxRetries)
-        }, 200 * (retryCount + 1))
-      }
     }
   })
 }
 
 onMounted(() => {
-  initStarAnimations()
+  setTimeout(() => {
+    initStarAnimations()
+  }, 100)
   
-  // Watch for data changes to re-animate new stars
   watch(() => [props.events, props.mode], () => {
-    // Use nextTick to ensure DOM updates are complete
     nextTick(() => {
-      initStarAnimations()
+      setTimeout(() => {
+        initStarAnimations()
+      }, 50)
     })
   }, { deep: true })
 })

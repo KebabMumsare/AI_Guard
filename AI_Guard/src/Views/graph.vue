@@ -1,23 +1,19 @@
 <script setup>
-import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
-import { gsap } from 'gsap'
+import { ref, onMounted, onUnmounted } from 'vue'
 import BlockGraph from '../components/BlockGraph.vue'
 import mockData from '../data/mockData.json'
 
 const events = ref(Array.isArray(mockData) ? mockData : [])
 
-// Log state variables
 const logs = ref([])
 const loading = ref(true)
 const error = ref(null)
 
-// Pagination state
 const currentPage = ref(1)
 const totalPages = ref(1)
-const limit = 15 // Items per page
+const limit = 15
 let intervalId = null
 
-// Function to fetch logs from the backend API
 const fetchLogs = async (page = 1) => {
   loading.value = true
   try {
@@ -27,7 +23,6 @@ const fetchLogs = async (page = 1) => {
     const data = await response.json()
     logs.value = data.logs
     
-    // Update pagination info
     if (data.pagination) {
       currentPage.value = data.pagination.page
       totalPages.value = data.pagination.totalPages
@@ -40,7 +35,6 @@ const fetchLogs = async (page = 1) => {
   }
 }
 
-// Navigation functions
 const nextPage = () => {
   if (currentPage.value < totalPages.value) {
     fetchLogs(currentPage.value + 1)
@@ -53,76 +47,17 @@ const prevPage = () => {
   }
 }
 
-// Helper to format the date nicely
 const formatDate = (dateString) => {
   return new Date(dateString).toLocaleString()
 }
 
-// Pulse animation for loading state
-let pulseAnimation = null
-
-watch(loading, (isLoading) => {
-  // Check if GSAP is available
-  if (typeof gsap === 'undefined') {
-    console.error('[Graph] GSAP is not loaded!')
-    return
-  }
-
-  if (isLoading) {
-    nextTick(() => {
-      try {
-        const pulseElement = document.querySelector('.log-status.animate-pulse')
-        if (pulseElement) {
-          // Check for reduced motion preference
-          const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-          
-          // Kill any existing animation first
-          if (pulseAnimation) {
-            pulseAnimation.kill()
-            pulseAnimation = null
-          }
-
-          if (prefersReducedMotion) {
-            // If reduced motion, set static opacity instead of animating
-            gsap.set(pulseElement, { opacity: 0.5 })
-          } else {
-            pulseAnimation = gsap.to(pulseElement, {
-              opacity: 0.5,
-              duration: 1,
-              repeat: -1,
-              yoyo: true,
-              ease: 'power1.inOut'
-            })
-          }
-        }
-      } catch (error) {
-        console.error('[Graph] Error initializing pulse animation:', error)
-      }
-    })
-  } else {
-    if (pulseAnimation) {
-      try {
-        pulseAnimation.kill()
-      } catch (error) {
-        console.warn('[Graph] Error killing pulse animation:', error)
-      }
-      pulseAnimation = null
-    }
-  }
-}, { immediate: true })
-
-// When the component loads...
 onMounted(() => {
   fetchLogs(currentPage.value)
-  // Refresh current page every 10 seconds
   intervalId = setInterval(() => fetchLogs(currentPage.value), 10000)
 })
 
 onUnmounted(() => {
   if (intervalId) clearInterval(intervalId)
-  if (pulseAnimation) {
-    pulseAnimation.kill()
-  }
 })
 </script>
 
