@@ -145,6 +145,32 @@ onUnmounted(() => {
 }
 
 /* Fade-in animations - CSS */
+@-webkit-keyframes fadeInUp {
+  from {
+    opacity: 0;
+    -webkit-transform: translate3d(0, 20px, 0);
+    transform: translate3d(0, 20px, 0);
+  }
+  to {
+    opacity: 1;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@-moz-keyframes fadeInUp {
+  from {
+    opacity: 0;
+    -moz-transform: translate3d(0, 20px, 0);
+    transform: translate3d(0, 20px, 0);
+  }
+  to {
+    opacity: 1;
+    -moz-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -152,6 +178,32 @@ onUnmounted(() => {
   }
   to {
     opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@-webkit-keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    -webkit-transform: translate3d(-30px, 0, 0);
+    transform: translate3d(-30px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    -webkit-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@-moz-keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    -moz-transform: translate3d(-30px, 0, 0);
+    transform: translate3d(-30px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    -moz-transform: translate3d(0, 0, 0);
     transform: translate3d(0, 0, 0);
   }
 }
@@ -168,23 +220,47 @@ onUnmounted(() => {
 }
 
 .animate-title {
-  animation: fadeInUp 0.8s ease-out forwards;
   opacity: 0;
+  -webkit-animation: fadeInUp 0.8s ease-out forwards;
+  -moz-animation: fadeInUp 0.8s ease-out forwards;
+  -o-animation: fadeInUp 0.8s ease-out forwards;
+  animation: fadeInUp 0.8s ease-out forwards;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  will-change: opacity, transform;
 }
 
 .animate-text {
-  animation: fadeInUp 0.8s ease-out 0.3s forwards;
   opacity: 0;
+  -webkit-animation: fadeInUp 0.8s ease-out 0.3s forwards;
+  -moz-animation: fadeInUp 0.8s ease-out 0.3s forwards;
+  -o-animation: fadeInUp 0.8s ease-out 0.3s forwards;
+  animation: fadeInUp 0.8s ease-out 0.3s forwards;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  will-change: opacity, transform;
 }
 
 .animate-created {
-  animation: fadeInUp 0.8s ease-out 0.5s forwards;
   opacity: 0;
+  -webkit-animation: fadeInUp 0.8s ease-out 0.5s forwards;
+  -moz-animation: fadeInUp 0.8s ease-out 0.5s forwards;
+  -o-animation: fadeInUp 0.8s ease-out 0.5s forwards;
+  animation: fadeInUp 0.8s ease-out 0.5s forwards;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  will-change: opacity, transform;
 }
 
 .animate-button {
-  animation: fadeInLeft 0.8s ease-out 0.7s forwards;
   opacity: 0;
+  -webkit-animation: fadeInLeft 0.8s ease-out 0.7s forwards;
+  -moz-animation: fadeInLeft 0.8s ease-out 0.7s forwards;
+  -o-animation: fadeInLeft 0.8s ease-out 0.7s forwards;
+  animation: fadeInLeft 0.8s ease-out 0.7s forwards;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  will-change: opacity, transform;
 }
 
 .button-hover-glow {
