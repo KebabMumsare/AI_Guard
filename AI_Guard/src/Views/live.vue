@@ -47,32 +47,62 @@ onMounted(() => {
   })
   
   // Pulse animation for LIVE indicator
-  nextTick(() => {
-    const pulseElement = document.querySelector('.animate-pulse')
-    if (pulseElement) {
-      gsap.to(pulseElement, {
-        opacity: 0.5,
-        duration: 1,
-        repeat: -1,
-        yoyo: true,
-        ease: 'power1.inOut'
-      })
+  const initPulseAnimation = (retryCount = 0, maxRetries = 3) => {
+    // Check if GSAP is available
+    if (typeof gsap === 'undefined') {
+      console.error('[Live] GSAP is not loaded!')
+      return
     }
-  })
-  
-  // Also check after a short delay in case element isn't ready yet
-  setTimeout(() => {
-    const pulseElement = document.querySelector('.animate-pulse')
-    if (pulseElement && !gsap.isTweening(pulseElement)) {
-      gsap.to(pulseElement, {
-        opacity: 0.5,
-        duration: 1,
-        repeat: -1,
-        yoyo: true,
-        ease: 'power1.inOut'
+
+    // Check for reduced motion preference
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (prefersReducedMotion) {
+      // If reduced motion, set static opacity instead of animating
+      nextTick(() => {
+        try {
+          const pulseElement = document.querySelector('.animate-pulse')
+          if (pulseElement) {
+            gsap.set(pulseElement, { opacity: 0.5 })
+          }
+        } catch (error) {
+          console.warn('[Live] Error setting static opacity for reduced motion:', error)
+        }
       })
+      return
     }
-  }, 100)
+
+    nextTick(() => {
+      try {
+        const pulseElement = document.querySelector('.animate-pulse')
+        if (pulseElement) {
+          // Kill any existing animation first
+          gsap.killTweensOf(pulseElement)
+          gsap.to(pulseElement, {
+            opacity: 0.5,
+            duration: 1,
+            repeat: -1,
+            yoyo: true,
+            ease: 'power1.inOut'
+          })
+        } else if (retryCount < maxRetries) {
+          // Element not found, retry with exponential backoff
+          setTimeout(() => {
+            initPulseAnimation(retryCount + 1, maxRetries)
+          }, 150 * (retryCount + 1))
+        }
+      } catch (error) {
+        console.error('[Live] Error initializing pulse animation:', error)
+        // Retry if attempts remain
+        if (retryCount < maxRetries) {
+          setTimeout(() => {
+            initPulseAnimation(retryCount + 1, maxRetries)
+          }, 200 * (retryCount + 1))
+        }
+      }
+    })
+  }
+
+  initPulseAnimation()
 })
 </script>
 

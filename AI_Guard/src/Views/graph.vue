@@ -62,26 +62,50 @@ const formatDate = (dateString) => {
 let pulseAnimation = null
 
 watch(loading, (isLoading) => {
+  // Check if GSAP is available
+  if (typeof gsap === 'undefined') {
+    console.error('[Graph] GSAP is not loaded!')
+    return
+  }
+
   if (isLoading) {
     nextTick(() => {
-      const pulseElement = document.querySelector('.log-status.animate-pulse')
-      if (pulseElement) {
-        // Kill any existing animation first
-        if (pulseAnimation) {
-          pulseAnimation.kill()
+      try {
+        const pulseElement = document.querySelector('.log-status.animate-pulse')
+        if (pulseElement) {
+          // Check for reduced motion preference
+          const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+          
+          // Kill any existing animation first
+          if (pulseAnimation) {
+            pulseAnimation.kill()
+            pulseAnimation = null
+          }
+
+          if (prefersReducedMotion) {
+            // If reduced motion, set static opacity instead of animating
+            gsap.set(pulseElement, { opacity: 0.5 })
+          } else {
+            pulseAnimation = gsap.to(pulseElement, {
+              opacity: 0.5,
+              duration: 1,
+              repeat: -1,
+              yoyo: true,
+              ease: 'power1.inOut'
+            })
+          }
         }
-        pulseAnimation = gsap.to(pulseElement, {
-          opacity: 0.5,
-          duration: 1,
-          repeat: -1,
-          yoyo: true,
-          ease: 'power1.inOut'
-        })
+      } catch (error) {
+        console.error('[Graph] Error initializing pulse animation:', error)
       }
     })
   } else {
     if (pulseAnimation) {
-      pulseAnimation.kill()
+      try {
+        pulseAnimation.kill()
+      } catch (error) {
+        console.warn('[Graph] Error killing pulse animation:', error)
+      }
       pulseAnimation = null
     }
   }
