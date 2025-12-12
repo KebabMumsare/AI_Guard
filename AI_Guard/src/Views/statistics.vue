@@ -73,7 +73,7 @@ onUnmounted(() => {
 
 <template>
   <div class="graph-page">
-    <PageTitle title="Event Graph" />
+    <PageTitle title="Statistics" />
     
     <div class="content-wrapper">
       <div class="graphs-section">

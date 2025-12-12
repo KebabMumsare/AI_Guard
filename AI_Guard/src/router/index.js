@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Admin from '../Views/admin.vue'
-import Graph from '../Views/graph.vue'
+import Statistics from '../Views/Statistics.vue'
 import Live from '../Views/live.vue'
 import Home from '../Views/home.vue'
 
@@ -16,9 +16,9 @@ const routes = [
     component: Admin
   },
   {
-    path: '/graph',
-    name: 'Graph',
-    component: Graph
+    path: '/statistics',
+    name: 'Statistics',
+    component: Statistics
   },
   {
     path: '/live',

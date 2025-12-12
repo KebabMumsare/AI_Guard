@@ -2,7 +2,7 @@
   <nav class="navbar">
     <router-link to="/admin" class="nav-link">Admin</router-link>
     <span class="separator">|</span>
-    <router-link to="/graph" class="nav-link">Graph</router-link>
+    <router-link to="/statistics" class="nav-link">Statistics</router-link>
     <span class="separator">|</span>
     <router-link to="/home" class="nav-link">Home</router-link>
     <span class="separator">|</span>
