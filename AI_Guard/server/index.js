@@ -112,6 +112,32 @@ app.get('/api/stats', (req, res) => {
     });
 });
 
+// 4. Get Admin Stats
+// Fetches total events and events today for the Admin panel.
+app.get('/api/admin/stats', (req, res) => {
+    const sqlTotal = `SELECT COUNT(*) as count FROM logs`;
+    const sqlToday = `SELECT COUNT(*) as count FROM logs WHERE date(timestamp) = date('now')`;
+
+    db.get(sqlTotal, [], (err, rowTotal) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+
+        db.get(sqlToday, [], (err, rowToday) => {
+            if (err) {
+                res.status(500).json({ error: err.message });
+                return;
+            }
+
+            res.json({
+                totalEvents: rowTotal.count,
+                eventsToday: rowToday.count
+            });
+        });
+    });
+});
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
