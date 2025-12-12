@@ -1,23 +1,52 @@
 <script setup>
-import { onMounted, ref, nextTick } from 'vue'
+import { onMounted, ref, nextTick, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { gsap } from 'gsap'
 import Navbar from './components/Navbar.vue'
 import MatrixBG from './Assets/MatrixBG.mp4'
 
 const videoRef = ref(null)
+const route = useRoute()
+const isVideoReady = ref(false)
 
 const setPlaybackSpeed = (event) => {
   const video = event?.target || videoRef.value
   if (video) {
-    video.playbackRate = 0.8
+    video.playbackRate = 0.5
   }
 }
+
+const handleVideoReady = () => {
+  isVideoReady.value = true
+}
+
+const handleLoadedMetadata = (event) => {
+  setPlaybackSpeed(event)
+  handleVideoReady()
+}
+
+const handleCanPlay = (event) => {
+  setPlaybackSpeed(event)
+  handleVideoReady()
+}
+
+// Pause video during route transitions to improve latency on slower devices
+watch(() => route.path, () => {
+  if (videoRef.value) {
+    videoRef.value.pause()
+    // Resume after a short delay to allow route transition to finish :p
+    setTimeout(() => {
+      if (videoRef.value) {
+        videoRef.value.play().catch(() => {})
+      }
+    }, 100)
+  }
+})
 
 onMounted(async () => {
   await nextTick()
   if (videoRef.value) {
     setPlaybackSpeed({ target: videoRef.value })
-    // Try multiple times to ensure it sticks
     setTimeout(() => setPlaybackSpeed({ target: videoRef.value }), 100)
     setTimeout(() => setPlaybackSpeed({ target: videoRef.value }), 500)
     setTimeout(() => setPlaybackSpeed({ target: videoRef.value }), 1000)
@@ -29,16 +58,20 @@ onMounted(async () => {
   <div id="app" class="relative">
     <!-- Background Video -->
     <div class="video-wrapper">
+      <!-- Loading placeholder - shows immediately -->
+      <div class="video-placeholder"></div>
       <video
         ref="videoRef"
         class="background-video"
+        :class="{ 'video-loaded': isVideoReady }"
         autoplay
         loop
         muted
         playsinline
-        @loadedmetadata="setPlaybackSpeed"
+        preload="metadata"
+        @loadedmetadata="handleLoadedMetadata"
         @loadeddata="setPlaybackSpeed"
-        @canplay="setPlaybackSpeed"
+        @canplay="handleCanPlay"
         @playing="setPlaybackSpeed"
         @play="setPlaybackSpeed"
       >
@@ -73,6 +106,18 @@ onMounted(async () => {
   height: 100%;
   z-index: 0;
   overflow: hidden;
+  will-change: transform;
+}
+
+.video-placeholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #1a1a1a;
+  z-index: 0;
+  transition: opacity 0.5s ease-out;
 }
 
 .background-video {
@@ -83,9 +128,23 @@ onMounted(async () => {
   min-height: 100%;
   width: auto;
   height: auto;
-  transform: translate(-50%, -50%);
-  filter: blur(200px) brightness(1.2) saturate(1.5) contrast(1.1);
+  transform: translate3d(-50%, -50%, 0);
+  filter: blur(200px) brightness(1) saturate(1.5) contrast(1.1);
   object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.5s ease-in;
+  will-change: transform, filter;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.background-video.video-loaded {
+  opacity: 1;
+}
+
+.video-loaded ~ .video-placeholder {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .dither-overlay {
@@ -100,6 +159,8 @@ onMounted(async () => {
   background-size: 100px 100px;
   mix-blend-mode: soft-light;
   opacity: 0.6;
+  will-change: transform;
+  transform: translate3d(0, 0, 0);
 }
 
 body {
