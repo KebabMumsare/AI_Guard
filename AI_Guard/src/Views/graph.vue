@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
 import BlockGraph from '../components/BlockGraph.vue'
+import PageTitle from '../components/PageTitle.vue'
 import mockData from '../data/mockData.json'
 
 const events = ref(Array.isArray(mockData) ? mockData : [])
@@ -72,7 +73,7 @@ onUnmounted(() => {
 
 <template>
   <div class="graph-page">
-    <h1 class="graph-title">Event Graph</h1>
+    <PageTitle title="Event Graph" />
     
     <div class="content-wrapper">
       <div class="graphs-section">
@@ -160,15 +161,6 @@ onUnmounted(() => {
   padding: 1vh 1.5vw;
   box-sizing: border-box;
   overflow: hidden;
-}
-
-.graph-title {
-  color: #8ffe83;
-  font-weight: bold;
-  font-size: clamp(1.5rem, 4vw, 3rem);
-  margin-bottom: 1vh;
-  text-align: center;
-  flex-shrink: 0;
 }
 
 .content-wrapper {
@@ -521,10 +513,6 @@ onUnmounted(() => {
     max-height: calc(60vh - 4rem);
   }
   
-  .graph-title {
-    margin-bottom: 0.5vh;
-    font-size: clamp(1.25rem, 5vw, 2.5rem);
-  }
 }
 
 /* Very small screens */
