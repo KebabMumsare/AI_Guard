@@ -264,8 +264,8 @@ const getLabel = (item) => {
   display: flex;
   flex-direction: column;
   width: clamp(300px, 45vw, 600px);
-  min-height: clamp(300px, 50vh, 400px);
-  max-height: 85vh;
+  flex: 1;
+  min-height: 350px;
 }
 
 @media (max-width: 1080px) {

@@ -158,9 +158,13 @@ onUnmounted(() => {
   flex-direction: column;
   height: calc(100vh - 60px); /* Subtract navbar height */
   max-height: calc(100vh - 60px);
-  padding: 1vh 1.5vw;
+  padding: 20px 20px 40px;
   box-sizing: border-box;
   overflow: hidden;
+}
+
+.graph-page :deep(.page-title) {
+  flex-shrink: 0;
 }
 
 .content-wrapper {
@@ -169,16 +173,19 @@ onUnmounted(() => {
   gap: 1.5vw;
   overflow: hidden;
   min-height: 0; /* Important for flex children to respect overflow */
+  box-sizing: border-box;
+  justify-content: space-between;
 }
 
 .graphs-section {
-  flex: 1;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  overflow-x: hidden;
-  padding-right: 0.5vw;
+  overflow-x: auto;
   min-height: 0;
+  min-width: 0;
+  height: 100%;
+  padding-right: 1vw;
 }
 
 /* Custom scrollbar for graphs section */
@@ -197,7 +204,9 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 1.5vh;
-  width: 100%;
+  width: fit-content;
+  min-width: clamp(300px, 45vw, 600px);
+  flex: 1;
   min-height: 0;
 }
 
@@ -208,19 +217,20 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  height: 100%;
+  flex: 1;
 }
 
 .log-container {
   background-color: #37393B;
   border: 3px solid rgba(143, 254, 131, 0.2);
   padding: 1vh 1vw;
-  height: 80vh;
+  flex: 1;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   box-shadow: 0.625rem 0.625rem 0 rgba(0, 0, 0, 0.3);
   box-sizing: border-box;
+  min-height: 0;
 }
 
 .log-title {
@@ -510,7 +520,17 @@ onUnmounted(() => {
   .graphs-section {
     flex: 1;
     min-height: 0;
-    max-height: calc(60vh - 4rem);
+    width: 100%;
+  }
+  
+  .graphs-container {
+    width: 100%;
+    min-width: unset;
+    max-width: 100%;
+  }
+  
+  .graphs-section {
+    align-items: stretch;
   }
   
 }
