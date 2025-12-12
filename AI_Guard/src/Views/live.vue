@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import PageTitle from '../components/PageTitle.vue'
 
 const isLive = ref(true)
 const isFullscreen = ref(false)
@@ -49,7 +50,7 @@ onMounted(() => {
 
 <template>
   <div class="live-view-container">
-    <h1 class="live-title">Live Camera Feed</h1>
+    <PageTitle title="Live Camera Feed" />
     
     <div class="live-content-wrapper">
       <div class="video-section">
@@ -138,25 +139,6 @@ onMounted(() => {
   padding: 1.5rem;
   display: flex;
   flex-direction: column;
-}
-
-.live-title {
-  color: #8ffe83;
-  font-weight: bold;
-  margin-bottom: 1.5rem;
-  text-align: center;
-}
-
-@media (min-width: 640px) {
-  .live-title {
-    font-size: 3rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .live-title {
-    font-size: 3rem;
-  }
 }
 
 .live-content-wrapper {
@@ -402,11 +384,6 @@ onMounted(() => {
 @media (max-width: 48rem) {
   .live-view-container {
     padding: 1rem;
-  }
-  
-  .live-title {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
   }
   
   .camera-info {

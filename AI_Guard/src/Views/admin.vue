@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import PageTitle from '../components/PageTitle.vue'
 
 const activeSection = ref('status')
 const alarmEnabled = ref(true)
@@ -94,7 +95,7 @@ const selectSection = (sectionId) => {
 
 <template>
   <div class="admin-container">
-    <h1 class="admin-title">Admin Panel</h1>
+    <PageTitle title="Admin Panel" />
     
     <div class="admin-layout">
       <div class="admin-sidebar">
@@ -301,26 +302,6 @@ const selectSection = (sectionId) => {
   display: flex;
   flex-direction: column;
   align-items: center;
-}
-
-.admin-title {
-  color: #8ffe83;
-  font-weight: bold;
-  font-size: 3rem;
-  margin-bottom: 3vh;
-  text-align: center;
-}
-
-@media (min-width: 640px) {
-  .admin-title {
-    font-size: 4rem;
-  }
-}
-
-@media (min-width: 1024px) {
-  .admin-title {
-    font-size: 5rem;
-  }
 }
 
 .admin-layout {
