@@ -1,156 +1,12 @@
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { gsap } from 'gsap'
 
 const router = useRouter()
 const connectionStatus = ref('online')
 
-// Template refs for animated elements
-const titleRef = ref(null)
-const textRef = ref(null)
-const createdRef = ref(null)
-const buttonRef = ref(null)
-
 onMounted(() => {
   document.body.style.overflowY = 'hidden'
-  
-  // Wait for DOM to be ready
-  nextTick(() => {
-    // Check if GSAP is available
-    if (typeof gsap === 'undefined') {
-      console.error('GSAP is not loaded!')
-      // Fallback: show elements immediately
-      if (titleRef.value) titleRef.value.style.opacity = '1'
-      if (textRef.value) textRef.value.style.opacity = '1'
-      if (createdRef.value) createdRef.value.style.opacity = '1'
-      if (buttonRef.value) buttonRef.value.style.opacity = '1'
-      return
-    }
-    
-    // Check for reduced motion preference
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    
-    if (!prefersReducedMotion) {
-      // Wave animations
-      const wave1 = document.querySelector('.wave-animation-1')
-      const wave2 = document.querySelector('.wave-animation-2')
-      const wave3 = document.querySelector('.wave-animation-3')
-      
-      if (wave1) {
-        gsap.to(wave1, {
-          x: '-4%',
-          y: -2,
-          scale: 1.12,
-          duration: 15,
-          repeat: -1,
-          yoyo: true,
-          ease: 'sine.inOut'
-        })
-      }
-      
-      if (wave2) {
-        gsap.to(wave2, {
-          x: '-4%',
-          y: -2,
-          scale: 1.12,
-          duration: 20,
-          repeat: -1,
-          yoyo: true,
-          ease: 'sine.inOut',
-          delay: -5
-        })
-      }
-      
-      if (wave3) {
-        gsap.to(wave3, {
-          x: '-4%',
-          y: -2,
-          scale: 1.12,
-          duration: 25,
-          repeat: -1,
-          yoyo: true,
-          ease: 'sine.inOut',
-          delay: -10
-        })
-      }
-      
-      // Fade-in animations using template refs
-      if (titleRef.value) {
-        gsap.fromTo(titleRef.value, 
-          { opacity: 0, y: 20 },
-          { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out', delay: 0 }
-        )
-      }
-      
-      if (textRef.value) {
-        gsap.fromTo(textRef.value,
-          { opacity: 0, y: 20 },
-          { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out', delay: 0.3 }
-        )
-      }
-      
-      if (createdRef.value) {
-        gsap.fromTo(createdRef.value,
-          { opacity: 0, y: 20 },
-          { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out', delay: 0.5 }
-        )
-      }
-      
-      if (buttonRef.value) {
-        gsap.fromTo(buttonRef.value,
-          { opacity: 0, x: -30 },
-          { opacity: 1, x: 0, duration: 0.8, ease: 'power2.out', delay: 0.7 }
-        )
-      }
-      
-      // Pulse animation for LIVE indicator
-      const pulseEl = document.querySelector('.animate-pulse')
-      if (pulseEl) {
-        gsap.to(pulseEl, {
-          opacity: 0.5,
-          duration: 1,
-          repeat: -1,
-          yoyo: true,
-          ease: 'power1.inOut'
-        })
-      }
-    } else {
-      // If reduced motion, just show elements immediately
-      if (titleRef.value) gsap.set(titleRef.value, { opacity: 1, x: 0, y: 0 })
-      if (textRef.value) gsap.set(textRef.value, { opacity: 1, x: 0, y: 0 })
-      if (createdRef.value) gsap.set(createdRef.value, { opacity: 1, x: 0, y: 0 })
-      if (buttonRef.value) gsap.set(buttonRef.value, { opacity: 1, x: 0, y: 0 })
-    }
-    
-    // Fallback: ensure elements are visible after 1.5 seconds if GSAP didn't work
-    setTimeout(() => {
-      if (titleRef.value) {
-        const computed = window.getComputedStyle(titleRef.value)
-        if (parseFloat(computed.opacity) < 0.1) {
-          gsap.set(titleRef.value, { opacity: 1, x: 0, y: 0 })
-        }
-      }
-      if (textRef.value) {
-        const computed = window.getComputedStyle(textRef.value)
-        if (parseFloat(computed.opacity) < 0.1) {
-          gsap.set(textRef.value, { opacity: 1, x: 0, y: 0 })
-        }
-      }
-      if (createdRef.value) {
-        const computed = window.getComputedStyle(createdRef.value)
-        if (parseFloat(computed.opacity) < 0.1) {
-          gsap.set(createdRef.value, { opacity: 1, x: 0, y: 0 })
-        }
-      }
-      if (buttonRef.value) {
-        const computed = window.getComputedStyle(buttonRef.value)
-        if (parseFloat(computed.opacity) < 0.1) {
-          gsap.set(buttonRef.value, { opacity: 1, x: 0, y: 0 })
-        }
-      }
-    }, 1500)
-  })
 })
 
 onUnmounted(() => {
@@ -169,9 +25,9 @@ onUnmounted(() => {
     </div>
     
     <div class="flex flex-col flex-1 max-w-full lg:max-w-[90rem] relative z-10 mb-2 sm:mb-3 md:mb-4 lg:mb-0">
-      <h1 ref="titleRef" class="text-[#8ffe83] text-xl sm:text-2xl md:text-3xl lg:text-6xl xl:text-8xl 2xl:text-9xl font-bold mb-0.5 sm:mb-1 md:mb-2 lg:mb-3 animate-title">Welcome!</h1>
-      <p ref="textRef" class="text-[#8ffe83] text-[10px] sm:text-xs md:text-sm lg:text-lg xl:text-xl 2xl:text-2xl max-w-full lg:max-w-3xl leading-tight sm:leading-tight md:leading-snug lg:leading-relaxed mb-0.5 sm:mb-1 animate-text">This is an AI system that uses cameras to detect different instances of events and show them in a graph as well as logging them into a database. The system provides real-time monitoring and analysis of various events captured through camera feeds, allowing you to visualize patterns and trends through interactive graphs. All detected events are automatically logged into a comprehensive database for historical analysis and reporting. Navigate through the dashboard to explore live camera feeds, view detailed event graphs, and access the complete event log.</p>
-      <div ref="createdRef" class="flex flex-row flex-wrap gap-0.5 sm:gap-1 md:gap-2 content-row mb-0.5 sm:mb-1 animate-created">
+      <h1 class="text-[#8ffe83] text-xl sm:text-2xl md:text-3xl lg:text-6xl xl:text-8xl 2xl:text-9xl font-bold mb-0.5 sm:mb-1 md:mb-2 lg:mb-3 animate-title">Welcome!</h1>
+      <p class="text-[#8ffe83] text-[10px] sm:text-xs md:text-sm lg:text-lg xl:text-xl 2xl:text-2xl max-w-full lg:max-w-3xl leading-tight sm:leading-tight md:leading-snug lg:leading-relaxed mb-0.5 sm:mb-1 animate-text">This is an AI system that uses cameras to detect different instances of events and show them in a graph as well as logging them into a database. The system provides real-time monitoring and analysis of various events captured through camera feeds, allowing you to visualize patterns and trends through interactive graphs. All detected events are automatically logged into a comprehensive database for historical analysis and reporting. Navigate through the dashboard to explore live camera feeds, view detailed event graphs, and access the complete event log.</p>
+      <div class="flex flex-row flex-wrap gap-0.5 sm:gap-1 md:gap-2 content-row mb-0.5 sm:mb-1 animate-created">
         <p class="text-[#8ffe83] text-[10px] sm:text-xs md:text-sm lg:text-lg xl:text-xl 2xl:text-2xl max-w-full">Created by:</p>
         <a href="https://github.com/Mykyta-G" class="text-[#8ffe83] text-[10px] sm:text-xs md:text-sm lg:text-lg xl:text-xl 2xl:text-2xl max-w-full link-hover-glow">Mykyta-G,</a>
         <a href="https://github.com/eliahdim" class="text-[#8ffe83] text-[10px] sm:text-xs md:text-sm lg:text-lg xl:text-xl 2xl:text-2xl max-w-full link-hover-glow">Eliah-D,</a>
@@ -179,7 +35,7 @@ onUnmounted(() => {
         <a href="https://github.com/andigj" class="text-[#8ffe83] text-[10px] sm:text-xs md:text-sm lg:text-lg xl:text-xl 2xl:text-2xl max-w-full link-hover-glow">Andi-G &</a>
         <a href="https://github.com/kebabmumsare" class="text-[#8ffe83] text-[10px] sm:text-xs md:text-sm lg:text-lg xl:text-xl 2xl:text-2xl max-w-full link-hover-glow">Jesper-A</a>
       </div>
-      <button ref="buttonRef" @click="router.push('/live')" class="bg-[#8ffe83] text-black p-1 sm:p-1.5 md:p-2 lg:p-3 rounded-md mt-0.5 sm:mt-1 md:mt-2 lg:mt-3 w-fit text-[10px] sm:text-xs md:text-sm lg:text-base xl:text-lg animate-button button-hover-glow button-press">Go to Dashboard</button>
+      <button @click="router.push('/live')" class="bg-[#8ffe83] text-black p-1 sm:p-1.5 md:p-2 lg:p-3 rounded-md mt-0.5 sm:mt-1 md:mt-2 lg:mt-3 w-fit text-[10px] sm:text-xs md:text-sm lg:text-base xl:text-lg animate-button button-hover-glow button-press">Go to Dashboard</button>
     </div>
     <div class="h-[20vh] sm:h-[25vh] md:h-[30vh] lg:h-[50vh] w-full sm:w-[85%] md:w-[75%] lg:w-[60vh] xl:w-[60vh] bg-black rounded-md overflow-hidden flex-shrink-0 relative z-10 mx-auto lg:mx-0">
       <div class="w-full h-full flex items-center justify-center bg-black">
@@ -190,7 +46,7 @@ onUnmounted(() => {
       </div>
       
       <div class="absolute top-1 sm:top-2 left-1 sm:left-2 flex items-center gap-1 sm:gap-2 bg-black bg-opacity-70 px-1.5 sm:px-2 md:px-3 py-0.5 sm:py-1 md:py-1.5 rounded-md">
-        <div class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-red-500 rounded-full animate-pulse"></div>
+        <div class="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-red-500 rounded-full pulse-animation"></div>
         <span class="text-white text-[8px] sm:text-[10px] md:text-xs font-semibold">LIVE</span>
       </div>
       
@@ -210,6 +66,20 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+/* Pulse animation for LIVE indicator */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.pulse-animation {
+  animation: pulse 1s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -232,32 +102,89 @@ onUnmounted(() => {
   }
 }
 
-/* Wave animations - Now handled by GSAP */
-.wave-animation-1,
-.wave-animation-2,
-.wave-animation-3 {
-  transform: translate3d(0, 0, 0) scale(1.1);
+/* Wave animations - CSS keyframes */
+@keyframes wave-animation-1 {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1.1);
+  }
+  50% {
+    transform: translate3d(-4%, -2px, 0) scale(1.12);
+  }
 }
 
-/* Fade-in animations - Initial state for GSAP */
+@keyframes wave-animation-2 {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1.1);
+  }
+  50% {
+    transform: translate3d(-4%, -2px, 0) scale(1.12);
+  }
+}
+
+@keyframes wave-animation-3 {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1.1);
+  }
+  50% {
+    transform: translate3d(-4%, -2px, 0) scale(1.12);
+  }
+}
+
+.wave-animation-1 {
+  animation: wave-animation-1 15s ease-in-out infinite;
+}
+
+.wave-animation-2 {
+  animation: wave-animation-2 20s ease-in-out infinite;
+  animation-delay: -5s;
+}
+
+.wave-animation-3 {
+  animation: wave-animation-3 25s ease-in-out infinite;
+  animation-delay: -10s;
+}
+
+/* Fade-in animations - CSS */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translate3d(-30px, 0, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
 .animate-title {
+  animation: fadeInUp 0.8s ease-out forwards;
   opacity: 0;
-  transform: translate3d(0, 20px, 0);
 }
 
 .animate-text {
+  animation: fadeInUp 0.8s ease-out 0.3s forwards;
   opacity: 0;
-  transform: translate3d(0, 20px, 0);
 }
 
 .animate-created {
+  animation: fadeInUp 0.8s ease-out 0.5s forwards;
   opacity: 0;
-  transform: translate3d(0, 20px, 0);
 }
 
 .animate-button {
+  animation: fadeInLeft 0.8s ease-out 0.7s forwards;
   opacity: 0;
-  transform: translate3d(-30px, 0, 0);
 }
 
 .button-hover-glow {

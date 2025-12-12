@@ -15,25 +15,6 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
   },
-  // Build configuration to ensure GSAP works correctly in production
-  build: {
-    commonjsOptions: {
-      include: [/gsap/, /node_modules/],
-      transformMixedEsModules: true
-    },
-    rollupOptions: {
-      output: {
-        // Ensure GSAP is not tree-shaken incorrectly
-        manualChunks: {
-          'gsap': ['gsap']
-        }
-      }
-    }
-  },
-  optimizeDeps: {
-    // Pre-bundle GSAP to ensure it's available
-    include: ['gsap']
-  },
   // Server configuration for local development
   server: {
     proxy: {

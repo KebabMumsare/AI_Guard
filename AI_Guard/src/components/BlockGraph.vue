@@ -1,6 +1,5 @@
 <script setup>
-import { computed, ref, watch, onMounted, nextTick } from 'vue'
-import { gsap } from 'gsap'
+import { computed, ref, watch } from 'vue'
 
 const props = defineProps({
   events: {
@@ -156,113 +155,6 @@ const getLabel = (item) => {
   return item.dayName
 }
 
-// Initialize GSAP pulse animations for star elements
-const initStarAnimations = (retryCount = 0, maxRetries = 3) => {
-  // Check if GSAP is available
-  if (typeof gsap === 'undefined') {
-    console.error('[BlockGraph] GSAP is not loaded!')
-    return
-  }
-
-  // Check for reduced motion preference
-  const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  if (prefersReducedMotion) {
-    // If reduced motion, set static opacity instead of animating
-    nextTick(() => {
-      try {
-        const starGlowLayers = document.querySelectorAll('.star-glow-layer')
-        const barCurrents = document.querySelectorAll('.bar-current')
-        starGlowLayers.forEach((layer) => {
-          gsap.set(layer, { opacity: 0.5 })
-        })
-        barCurrents.forEach((bar) => {
-          const centerStar = bar.querySelector('.center-star')
-          if (centerStar) {
-            gsap.set(centerStar, { opacity: 0.5 })
-          }
-        })
-      } catch (error) {
-        console.warn('[BlockGraph] Error setting static opacity for reduced motion:', error)
-      }
-    })
-    return
-  }
-
-  // Use nextTick to ensure DOM is ready
-  nextTick(() => {
-    try {
-      const starGlowLayers = document.querySelectorAll('.star-glow-layer')
-      const barCurrents = document.querySelectorAll('.bar-current')
-      
-      if (starGlowLayers.length === 0 && barCurrents.length === 0) {
-        // No elements found, retry if attempts remain
-        if (retryCount < maxRetries) {
-          setTimeout(() => {
-            initStarAnimations(retryCount + 1, maxRetries)
-          }, 150 * (retryCount + 1)) // Exponential backoff
-        }
-        return
-      }
-
-      // Animate star glow layers
-      starGlowLayers.forEach((layer) => {
-        try {
-          // Kill any existing animation first
-          gsap.killTweensOf(layer)
-          gsap.to(layer, {
-            opacity: 0.2,
-            duration: 1,
-            repeat: -1,
-            yoyo: true,
-            ease: 'sine.inOut'
-          })
-        } catch (error) {
-          console.warn('[BlockGraph] Error animating star layer:', error)
-        }
-      })
-      
-      // Animate the center star element directly (more compatible than CSS custom properties)
-      barCurrents.forEach((bar) => {
-        try {
-          // Find the center star element inside the bar
-          const centerStar = bar.querySelector('.center-star')
-          if (centerStar) {
-            gsap.killTweensOf(centerStar)
-            gsap.to(centerStar, {
-              opacity: 0.2,
-              duration: 1,
-              repeat: -1,
-              yoyo: true,
-              ease: 'sine.inOut'
-            })
-          }
-        } catch (error) {
-          console.warn('[BlockGraph] Error animating center star:', error)
-        }
-      })
-    } catch (error) {
-      console.error('[BlockGraph] Error initializing star animations:', error)
-      // Retry if attempts remain
-      if (retryCount < maxRetries) {
-        setTimeout(() => {
-          initStarAnimations(retryCount + 1, maxRetries)
-        }, 200 * (retryCount + 1))
-      }
-    }
-  })
-}
-
-onMounted(() => {
-  initStarAnimations()
-  
-  // Watch for data changes to re-animate new stars
-  watch(() => [props.events, props.mode], () => {
-    // Use nextTick to ensure DOM updates are complete
-    nextTick(() => {
-      initStarAnimations()
-    })
-  }, { deep: true })
-})
 </script>
 
 <template>
@@ -553,7 +445,16 @@ onMounted(() => {
   backface-visibility: hidden;
 }
 
-/* Pulse-brightness animation - Now handled by GSAP */
+/* Pulse-brightness animation - CSS keyframes */
+@keyframes star-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+
 .star-glow-layer {
   position: absolute;
   top: clamp(-6px, -0.9vh, -9px);
@@ -563,6 +464,11 @@ onMounted(() => {
   transform: translate3d(-50%, -50%, 0);
   pointer-events: none;
   opacity: 1;
+  animation: star-pulse 1s ease-in-out infinite;
+}
+
+.center-star {
+  animation: star-pulse 1s ease-in-out infinite;
 }
 
 .star-glow-1 {

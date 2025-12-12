@@ -1,6 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted, nextTick } from 'vue'
-import { gsap } from 'gsap'
+import { ref, onMounted, onUnmounted } from 'vue'
 
 const isLive = ref(true)
 const isFullscreen = ref(false)
@@ -45,64 +44,6 @@ onMounted(() => {
   document.addEventListener('fullscreenchange', () => {
     isFullscreen.value = !!document.fullscreenElement
   })
-  
-  // Pulse animation for LIVE indicator
-  const initPulseAnimation = (retryCount = 0, maxRetries = 3) => {
-    // Check if GSAP is available
-    if (typeof gsap === 'undefined') {
-      console.error('[Live] GSAP is not loaded!')
-      return
-    }
-
-    // Check for reduced motion preference
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (prefersReducedMotion) {
-      // If reduced motion, set static opacity instead of animating
-      nextTick(() => {
-        try {
-          const pulseElement = document.querySelector('.animate-pulse')
-          if (pulseElement) {
-            gsap.set(pulseElement, { opacity: 0.5 })
-          }
-        } catch (error) {
-          console.warn('[Live] Error setting static opacity for reduced motion:', error)
-        }
-      })
-      return
-    }
-
-    nextTick(() => {
-      try {
-        const pulseElement = document.querySelector('.animate-pulse')
-        if (pulseElement) {
-          // Kill any existing animation first
-          gsap.killTweensOf(pulseElement)
-          gsap.to(pulseElement, {
-            opacity: 0.5,
-            duration: 1,
-            repeat: -1,
-            yoyo: true,
-            ease: 'power1.inOut'
-          })
-        } else if (retryCount < maxRetries) {
-          // Element not found, retry with exponential backoff
-          setTimeout(() => {
-            initPulseAnimation(retryCount + 1, maxRetries)
-          }, 150 * (retryCount + 1))
-        }
-      } catch (error) {
-        console.error('[Live] Error initializing pulse animation:', error)
-        // Retry if attempts remain
-        if (retryCount < maxRetries) {
-          setTimeout(() => {
-            initPulseAnimation(retryCount + 1, maxRetries)
-          }, 200 * (retryCount + 1))
-        }
-      }
-    })
-  }
-
-  initPulseAnimation()
 })
 </script>
 
@@ -121,7 +62,7 @@ onMounted(() => {
           </div>
           
           <div class="absolute top-4 left-4 flex items-center gap-2 bg-black bg-opacity-70 px-3 py-1.5 rounded-md">
-            <div class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+            <div class="w-2 h-2 bg-red-500 rounded-full pulse-animation"></div>
             <span class="text-white text-xs sm:text-sm font-semibold">LIVE</span>
           </div>
           
@@ -423,9 +364,18 @@ onMounted(() => {
   justify-content: center;
 }
 
-/* Pulse animation - Now handled by GSAP */
-.animate-pulse {
-  opacity: 1;
+/* Pulse animation - CSS keyframes */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.pulse-animation {
+  animation: pulse 1s ease-in-out infinite;
 }
 
 @media (max-width: 75rem) {

@@ -1,12 +1,5 @@
 <script setup>
-import { onMounted } from 'vue'
-import { gsap } from 'gsap'
 import Navbar from './components/Navbar.vue'
-
-onMounted(() => {
-  // Wave animations are handled in home.vue component
-  // This file doesn't need to initialize them since waves are in child components
-})
 </script>
 
 <template>
@@ -33,10 +26,5 @@ body {
   height: 100vh;
 }
 
-/* Wave Animations - Now handled by GSAP */
-.wave-animation-1,
-.wave-animation-2,
-.wave-animation-3 {
-  transform: translate3d(0, 0, 0) scale(1.1);
-}
+/* Wave Animations - Handled by CSS in home.vue */
 </style>

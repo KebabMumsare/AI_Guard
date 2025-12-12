@@ -1,6 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
-import { gsap } from 'gsap'
+import { ref, onMounted, onUnmounted } from 'vue'
 import BlockGraph from '../components/BlockGraph.vue'
 import mockData from '../data/mockData.json'
 
@@ -58,58 +57,6 @@ const formatDate = (dateString) => {
   return new Date(dateString).toLocaleString()
 }
 
-// Pulse animation for loading state
-let pulseAnimation = null
-
-watch(loading, (isLoading) => {
-  // Check if GSAP is available
-  if (typeof gsap === 'undefined') {
-    console.error('[Graph] GSAP is not loaded!')
-    return
-  }
-
-  if (isLoading) {
-    nextTick(() => {
-      try {
-        const pulseElement = document.querySelector('.log-status.animate-pulse')
-        if (pulseElement) {
-          // Check for reduced motion preference
-          const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-          
-          // Kill any existing animation first
-          if (pulseAnimation) {
-            pulseAnimation.kill()
-            pulseAnimation = null
-          }
-
-          if (prefersReducedMotion) {
-            // If reduced motion, set static opacity instead of animating
-            gsap.set(pulseElement, { opacity: 0.5 })
-          } else {
-            pulseAnimation = gsap.to(pulseElement, {
-              opacity: 0.5,
-              duration: 1,
-              repeat: -1,
-              yoyo: true,
-              ease: 'power1.inOut'
-            })
-          }
-        }
-      } catch (error) {
-        console.error('[Graph] Error initializing pulse animation:', error)
-      }
-    })
-  } else {
-    if (pulseAnimation) {
-      try {
-        pulseAnimation.kill()
-      } catch (error) {
-        console.warn('[Graph] Error killing pulse animation:', error)
-      }
-      pulseAnimation = null
-    }
-  }
-}, { immediate: true })
 
 // When the component loads...
 onMounted(() => {
@@ -120,9 +67,6 @@ onMounted(() => {
 
 onUnmounted(() => {
   if (intervalId) clearInterval(intervalId)
-  if (pulseAnimation) {
-    pulseAnimation.kill()
-  }
 })
 </script>
 
@@ -147,7 +91,7 @@ onUnmounted(() => {
             </button>
           </div>
           
-          <div v-if="loading && logs.length === 0" class="log-status animate-pulse">
+          <div v-if="loading && logs.length === 0" class="log-status pulse-animation">
             Loading logs...
           </div>
           
@@ -441,9 +385,18 @@ onUnmounted(() => {
   white-space: nowrap;
 }
 
-/* Pulse animation - Now handled by GSAP */
-.animate-pulse {
-  opacity: 1;
+/* Pulse animation - CSS keyframes */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.pulse-animation {
+  animation: pulse 1s ease-in-out infinite;
 }
 
 /* Medium screens - make sidebar slimmer */
