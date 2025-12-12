@@ -160,6 +160,7 @@ const getLabel = (item) => {
 const initStarAnimations = () => {
   setTimeout(() => {
     const starGlowLayers = document.querySelectorAll('.star-glow-layer')
+    const barCurrents = document.querySelectorAll('.bar-current')
     
     // Animate star glow layers
     starGlowLayers.forEach((layer) => {
@@ -167,6 +168,18 @@ const initStarAnimations = () => {
       gsap.killTweensOf(layer)
       gsap.to(layer, {
         opacity: 0.2,
+        duration: 1,
+        repeat: -1,
+        yoyo: true,
+        ease: 'sine.inOut'
+      })
+    })
+    
+    // Animating the center star via CSS custom property (since it's a pseudo-element)
+    barCurrents.forEach((bar) => {
+      gsap.killTweensOf(bar)
+      gsap.to(bar, {
+        '--star-opacity': 0.2,
         duration: 1,
         repeat: -1,
         yoyo: true,
@@ -454,6 +467,7 @@ onMounted(() => {
 .bar-current {
   background: linear-gradient(to top, #5faa57, #7fdf74, #9fff93) !important;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  --star-opacity: 1;
 }
 
 .bar-current::before {
@@ -468,7 +482,7 @@ onMounted(() => {
   clip-path: polygon(50% 0%, 61.8% 38.2%, 100% 50%, 61.8% 61.8%, 50% 100%, 38.2% 61.8%, 0% 50%, 38.2% 38.2%);
   z-index: 5;
   pointer-events: none;
-  opacity: 1;
+  opacity: var(--star-opacity, 1);
 }
 
 /* Pulse-brightness animation - Now handled by GSAP */
