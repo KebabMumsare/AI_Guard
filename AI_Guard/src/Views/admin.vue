@@ -36,6 +36,7 @@ const handleGlobalMouseMove = (event) => {
   }
 }
 
+
 onMounted(() => {
   document.addEventListener('mousemove', handleGlobalMouseMove)
 })
@@ -617,13 +618,23 @@ input:checked + .toggle-slider:before {
   background-color: rgba(0, 0, 0, 0.4);
 }
 
-/* FadeIn animation - Now handled by GSAP */
+/* FadeIn animation - CSS transition */
 .ip-reveal {
   width: 100%;
   cursor: pointer;
   position: relative;
   min-height: 3rem;
   opacity: 1;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .ip-reveal .router-input {

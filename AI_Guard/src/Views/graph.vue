@@ -5,15 +5,18 @@ import mockData from '../data/mockData.json'
 
 const events = ref(Array.isArray(mockData) ? mockData : [])
 
+// Log state variables
 const logs = ref([])
 const loading = ref(true)
 const error = ref(null)
 
+// Pagination state
 const currentPage = ref(1)
 const totalPages = ref(1)
-const limit = 15
+const limit = 15 // Items per page
 let intervalId = null
 
+// Function to fetch logs from the backend API
 const fetchLogs = async (page = 1) => {
   loading.value = true
   try {
@@ -23,6 +26,7 @@ const fetchLogs = async (page = 1) => {
     const data = await response.json()
     logs.value = data.logs
     
+    // Update pagination info
     if (data.pagination) {
       currentPage.value = data.pagination.page
       totalPages.value = data.pagination.totalPages
@@ -35,6 +39,7 @@ const fetchLogs = async (page = 1) => {
   }
 }
 
+// Navigation functions
 const nextPage = () => {
   if (currentPage.value < totalPages.value) {
     fetchLogs(currentPage.value + 1)
@@ -47,12 +52,16 @@ const prevPage = () => {
   }
 }
 
+// Helper to format the date nicely
 const formatDate = (dateString) => {
   return new Date(dateString).toLocaleString()
 }
 
+
+// When the component loads...
 onMounted(() => {
   fetchLogs(currentPage.value)
+  // Refresh current page every 10 seconds
   intervalId = setInterval(() => fetchLogs(currentPage.value), 10000)
 })
 
@@ -82,7 +91,7 @@ onUnmounted(() => {
             </button>
           </div>
           
-          <div v-if="loading && logs.length === 0" class="log-status animate-pulse">
+          <div v-if="loading && logs.length === 0" class="log-status pulse-animation">
             Loading logs...
           </div>
           
@@ -376,9 +385,18 @@ onUnmounted(() => {
   white-space: nowrap;
 }
 
-/* Pulse animation - Now handled by GSAP */
-.animate-pulse {
-  opacity: 1;
+/* Pulse animation - CSS keyframes */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.pulse-animation {
+  animation: pulse 1s ease-in-out infinite;
 }
 
 /* Medium screens - make sidebar slimmer */

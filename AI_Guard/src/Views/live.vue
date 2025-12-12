@@ -62,7 +62,7 @@ onMounted(() => {
           </div>
           
           <div class="absolute top-4 left-4 flex items-center gap-2 bg-black bg-opacity-70 px-3 py-1.5 rounded-md">
-            <div class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
+            <div class="w-2 h-2 bg-red-500 rounded-full pulse-animation"></div>
             <span class="text-white text-xs sm:text-sm font-semibold">LIVE</span>
           </div>
           
@@ -364,9 +364,18 @@ onMounted(() => {
   justify-content: center;
 }
 
-/* Pulse animation - Now handled by GSAP */
-.animate-pulse {
-  opacity: 1;
+/* Pulse animation - CSS keyframes */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.pulse-animation {
+  animation: pulse 1s ease-in-out infinite;
 }
 
 @media (max-width: 75rem) {

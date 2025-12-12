@@ -1,6 +1,5 @@
 <script setup>
-import { computed, ref, watch, onMounted, nextTick } from 'vue'
-import { gsap } from 'gsap'
+import { computed, ref, watch } from 'vue'
 
 const props = defineProps({
   events: {
@@ -14,26 +13,33 @@ const props = defineProps({
   }
 })
 
+// Get unique event types from the events
 const eventTypes = computed(() => {
   const unique = [...new Set(props.events.map(e => e.eventName))]
   return unique.sort()
 })
 
+// Selected event (defaults to first event type) - only used in 'filtered' mode
+// 'TOTAL' is a special value that means show all events combined
 const selectedEvent = ref('')
 
+// Initialize selectedEvent when eventTypes are available
 watch(eventTypes, (newTypes) => {
   if (newTypes.length > 0 && !newTypes.includes(selectedEvent.value) && selectedEvent.value !== 'TOTAL') {
     selectedEvent.value = newTypes[0]
   }
 }, { immediate: true })
 
+// Check if showing total events
 const isTotalEvents = computed(() => selectedEvent.value === 'TOTAL')
 
+// Get current week structure (Monday to Sunday)
 const getCurrentWeek = () => {
   const today = new Date()
   const day = today.getDay()
+  // Get Monday of current week (day 0 = Sunday, so we adjust)
   const monday = new Date(today)
-  const diff = day === 0 ? -6 : 1 - day
+  const diff = day === 0 ? -6 : 1 - day // If Sunday, go back 6 days, otherwise go to Monday
   monday.setDate(today.getDate() + diff)
   monday.setHours(0, 0, 0, 0)
   
@@ -55,8 +61,10 @@ const getCurrentWeek = () => {
   return week
 }
 
+// Process event data based on mode
 const data = computed(() => {
   if (props.mode === 'highscores') {
+    // Calculate total counts per event type
     const eventCounts = {}
     props.events.forEach(event => {
       if (!eventCounts[event.eventName]) {
@@ -65,12 +73,14 @@ const data = computed(() => {
       eventCounts[event.eventName]++
     })
     
+    // Convert to array and sort by count (descending)
     return eventTypes.value.map(eventType => ({
       label: eventType,
       count: eventCounts[eventType] || 0
     })).sort((a, b) => b.count - a.count)
   }
   
+  // For 'total' and 'filtered' modes, show weekly data
   const eventsToProcess = props.mode === 'total' || (props.mode === 'filtered' && isTotalEvents.value)
     ? props.events 
     : props.events.filter(e => e.eventName === selectedEvent.value)
@@ -89,8 +99,10 @@ const data = computed(() => {
     groupedByDate[dateKey].count++
   })
   
+  // Get current week structure
   const currentWeek = getCurrentWeek()
   
+  // Fill in counts for each day of the week
   currentWeek.forEach(day => {
     day.count = groupedByDate[day.date]?.count || 0
   })
@@ -98,6 +110,7 @@ const data = computed(() => {
   return currentWeek
 })
 
+// Max value is the highest bar + 10, rounded to nearest 10
 const maxValue = computed(() => {
   if (data.value.length === 0) return 10
   const max = Math.max(...data.value.map(d => d.count), 0)
@@ -105,22 +118,27 @@ const maxValue = computed(() => {
   return Math.round(valueWithPadding / 10) * 10 || 10
 })
 
+// Y-axis values at every 20% of maxValue
 const yAxisValues = computed(() => {
   const max = maxValue.value
-  const step = max * 0.2
+  const step = max * 0.2 // 20% of max
   const values = []
   
+  // 0 to max at 20% intervals on Y-axis
   for (let i = 0; i <= max; i += step) {
     values.push(Math.round(i))
   }
   
+  // Ensure max is included on da Y-axis
   if (values[values.length - 1] !== max) {
     values.push(max)
   }
   
+  // Return in descending order to display the y-axis
   return values.reverse()
 })
 
+// Check if a day is today (only for weekly view)
 const isCurrentDay = (dayName) => {
   if (props.mode === 'highscores') return false
   const today = new Date()
@@ -129,6 +147,7 @@ const isCurrentDay = (dayName) => {
   return dayName === todayName
 }
 
+// Get label for display
 const getLabel = (item) => {
   if (props.mode === 'highscores') {
     return item.label
@@ -136,41 +155,6 @@ const getLabel = (item) => {
   return item.dayName
 }
 
-const initStarAnimations = () => {
-  nextTick(() => {
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    
-    if (prefersReducedMotion) {
-      return
-    }
-
-    const starElements = document.querySelectorAll('.star-glow-layer, .center-star')
-    
-    if (starElements.length > 0) {
-      gsap.to(starElements, {
-        opacity: 0.2,
-        duration: 1,
-        repeat: -1,
-        yoyo: true,
-        ease: 'sine.inOut'
-      })
-    }
-  })
-}
-
-onMounted(() => {
-  setTimeout(() => {
-    initStarAnimations()
-  }, 100)
-  
-  watch(() => [props.events, props.mode], () => {
-    nextTick(() => {
-      setTimeout(() => {
-        initStarAnimations()
-      }, 50)
-    })
-  }, { deep: true })
-})
 </script>
 
 <template>
@@ -461,7 +445,16 @@ onMounted(() => {
   backface-visibility: hidden;
 }
 
-/* Pulse-brightness animation - Now handled by GSAP */
+/* Pulse-brightness animation - CSS keyframes */
+@keyframes star-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+
 .star-glow-layer {
   position: absolute;
   top: clamp(-6px, -0.9vh, -9px);
@@ -471,6 +464,11 @@ onMounted(() => {
   transform: translate3d(-50%, -50%, 0);
   pointer-events: none;
   opacity: 1;
+  animation: star-pulse 1s ease-in-out infinite;
+}
+
+.center-star {
+  animation: star-pulse 1s ease-in-out infinite;
 }
 
 .star-glow-1 {
