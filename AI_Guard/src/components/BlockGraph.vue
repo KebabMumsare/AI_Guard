@@ -176,7 +176,10 @@ const initStarAnimations = (retryCount = 0, maxRetries = 3) => {
           gsap.set(layer, { opacity: 0.5 })
         })
         barCurrents.forEach((bar) => {
-          gsap.set(bar, { '--star-opacity': 0.5 })
+          const centerStar = bar.querySelector('.center-star')
+          if (centerStar) {
+            gsap.set(centerStar, { opacity: 0.5 })
+          }
         })
       } catch (error) {
         console.warn('[BlockGraph] Error setting static opacity for reduced motion:', error)
@@ -218,19 +221,23 @@ const initStarAnimations = (retryCount = 0, maxRetries = 3) => {
         }
       })
       
-      // Animating the center star via CSS custom property (since it's a pseudo-element)
+      // Animate the center star element directly (more compatible than CSS custom properties)
       barCurrents.forEach((bar) => {
         try {
-          gsap.killTweensOf(bar)
-          gsap.to(bar, {
-            '--star-opacity': 0.2,
-            duration: 1,
-            repeat: -1,
-            yoyo: true,
-            ease: 'sine.inOut'
-          })
+          // Find the center star element inside the bar
+          const centerStar = bar.querySelector('.center-star')
+          if (centerStar) {
+            gsap.killTweensOf(centerStar)
+            gsap.to(centerStar, {
+              opacity: 0.2,
+              duration: 1,
+              repeat: -1,
+              yoyo: true,
+              ease: 'sine.inOut'
+            })
+          }
         } catch (error) {
-          console.warn('[BlockGraph] Error animating bar current:', error)
+          console.warn('[BlockGraph] Error animating center star:', error)
         }
       })
     } catch (error) {
@@ -334,6 +341,7 @@ onMounted(() => {
             >
               <span class="bar-value">{{ item.count }}</span>
               <template v-if="mode !== 'highscores' && isCurrentDay(item.dayName)">
+                <span class="center-star"></span>
                 <span v-for="n in 5" :key="n" :class="['star-glow-layer', `star-glow-${n}`]"></span>
               </template>
             </div>
@@ -526,11 +534,9 @@ onMounted(() => {
 .bar-current {
   background: linear-gradient(to top, #5faa57, #7fdf74, #9fff93) !important;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  --star-opacity: 1;
 }
 
-.bar-current::before {
-  content: '';
+.center-star {
   position: absolute;
   top: clamp(-6px, -0.9vh, -9px);
   left: 50%;
@@ -541,7 +547,10 @@ onMounted(() => {
   clip-path: polygon(50% 0%, 61.8% 38.2%, 100% 50%, 61.8% 61.8%, 50% 100%, 38.2% 61.8%, 0% 50%, 38.2% 38.2%);
   z-index: 5;
   pointer-events: none;
-  opacity: var(--star-opacity, 1);
+  opacity: 1;
+  will-change: opacity;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 /* Pulse-brightness animation - Now handled by GSAP */
