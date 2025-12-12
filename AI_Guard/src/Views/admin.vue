@@ -4,8 +4,8 @@ import { ref, onMounted, onUnmounted } from 'vue'
 const activeSection = ref('status')
 const alarmEnabled = ref(true)
 const systemStatus = ref('online')
-const totalEvents = ref(1247)
-const eventsToday = ref(23)
+const totalEvents = ref(0)
+const eventsToday = ref(0)
 const personDetection = ref(true)
 const fingerGesture = ref(true)
 const unknownObject = ref(true)
@@ -37,8 +37,20 @@ const handleGlobalMouseMove = (event) => {
 }
 
 
+const fetchStats = async () => {
+  try {
+    const response = await fetch('http://localhost:3000/api/admin/stats');
+    const data = await response.json();
+    totalEvents.value = data.totalEvents;
+    eventsToday.value = data.eventsToday;
+  } catch (error) {
+    console.error('Error fetching stats:', error);
+  }
+}
+
 onMounted(() => {
   document.addEventListener('mousemove', handleGlobalMouseMove)
+  fetchStats()
 })
 
 onUnmounted(() => {
