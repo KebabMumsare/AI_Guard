@@ -405,16 +405,9 @@ const getLabel = (item) => {
   justify-content: center;
   padding-top: clamp(0.3rem, 0.6vh, 6px);
   position: relative;
-  -webkit-transition: all 0.3s ease;
-  -moz-transition: all 0.3s ease;
-  -ms-transition: all 0.3s ease;
-  -o-transition: all 0.3s ease;
-  transition: all 0.3s ease;
+  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
   cursor: pointer;
   box-shadow: 0 clamp(1px, 0.2vh, 2px) clamp(2px, 0.4vh, 4px) rgba(0, 0, 0, 0.2);
-  will-change: transform, background;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
 }
 
 .bar:hover {
@@ -440,9 +433,6 @@ const getLabel = (item) => {
   z-index: 5;
   pointer-events: none;
   opacity: 1;
-  will-change: opacity;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
 }
 
 /* Pulse-brightness animation - CSS keyframes */

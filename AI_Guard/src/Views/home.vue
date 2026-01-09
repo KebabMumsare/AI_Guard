@@ -84,214 +84,96 @@ onUnmounted(() => {
   *,
   *::before,
   *::after {
-    -webkit-animation-duration: 0.01ms !important;
-    -moz-animation-duration: 0.01ms !important;
-    -ms-animation-duration: 0.01ms !important;
-    -o-animation-duration: 0.01ms !important;
     animation-duration: 0.01ms !important;
-    -webkit-animation-iteration-count: 1 !important;
-    -moz-animation-iteration-count: 1 !important;
-    -ms-animation-iteration-count: 1 !important;
-    -o-animation-iteration-count: 1 !important;
     animation-iteration-count: 1 !important;
-    -webkit-transition-duration: 0.01ms !important;
-    -moz-transition-duration: 0.01ms !important;
-    -ms-transition-duration: 0.01ms !important;
-    -o-transition-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
 }
 
-/* Wave animations - CSS keyframes */
-@keyframes wave-animation-1 {
+/* Wave animations - optimized for performance */
+@keyframes wave-animation {
   0%, 100% {
-    transform: translate3d(0, 0, 0) scale(1.1);
+    transform: translateX(0) scale(1.1);
   }
   50% {
-    transform: translate3d(-4%, -2px, 0) scale(1.12);
-  }
-}
-
-@keyframes wave-animation-2 {
-  0%, 100% {
-    transform: translate3d(0, 0, 0) scale(1.1);
-  }
-  50% {
-    transform: translate3d(-4%, -2px, 0) scale(1.12);
-  }
-}
-
-@keyframes wave-animation-3 {
-  0%, 100% {
-    transform: translate3d(0, 0, 0) scale(1.1);
-  }
-  50% {
-    transform: translate3d(-4%, -2px, 0) scale(1.12);
+    transform: translateX(-4%) translateY(-2px) scale(1.12);
   }
 }
 
 .wave-animation-1 {
-  animation: wave-animation-1 15s ease-in-out infinite;
+  animation: wave-animation 15s ease-in-out infinite;
+  transform-origin: center;
 }
 
 .wave-animation-2 {
-  animation: wave-animation-2 20s ease-in-out infinite;
+  animation: wave-animation 20s ease-in-out infinite;
   animation-delay: -5s;
+  transform-origin: center;
 }
 
 .wave-animation-3 {
-  animation: wave-animation-3 25s ease-in-out infinite;
+  animation: wave-animation 25s ease-in-out infinite;
   animation-delay: -10s;
+  transform-origin: center;
 }
 
-/* Fade-in animations - CSS */
-@-webkit-keyframes fadeInUp {
-  from {
-    opacity: 0;
-    -webkit-transform: translate3d(0, 20px, 0);
-    transform: translate3d(0, 20px, 0);
-  }
-  to {
-    opacity: 1;
-    -webkit-transform: translate3d(0, 0, 0);
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-@-moz-keyframes fadeInUp {
-  from {
-    opacity: 0;
-    -moz-transform: translate3d(0, 20px, 0);
-    transform: translate3d(0, 20px, 0);
-  }
-  to {
-    opacity: 1;
-    -moz-transform: translate3d(0, 0, 0);
-    transform: translate3d(0, 0, 0);
-  }
-}
-
+/* Fade-in animations - optimized */
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translate3d(0, 20px, 0);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-@-webkit-keyframes fadeInLeft {
-  from {
-    opacity: 0;
-    -webkit-transform: translate3d(-30px, 0, 0);
-    transform: translate3d(-30px, 0, 0);
-  }
-  to {
-    opacity: 1;
-    -webkit-transform: translate3d(0, 0, 0);
-    transform: translate3d(0, 0, 0);
-  }
-}
-
-@-moz-keyframes fadeInLeft {
-  from {
-    opacity: 0;
-    -moz-transform: translate3d(-30px, 0, 0);
-    transform: translate3d(-30px, 0, 0);
-  }
-  to {
-    opacity: 1;
-    -moz-transform: translate3d(0, 0, 0);
-    transform: translate3d(0, 0, 0);
+    transform: translateY(0);
   }
 }
 
 @keyframes fadeInLeft {
   from {
     opacity: 0;
-    transform: translate3d(-30px, 0, 0);
+    transform: translateX(-30px);
   }
   to {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
+    transform: translateX(0);
   }
 }
 
 .animate-title {
   opacity: 0;
-  -webkit-animation: fadeInUp 0.8s ease-out forwards;
-  -moz-animation: fadeInUp 0.8s ease-out forwards;
-  -o-animation: fadeInUp 0.8s ease-out forwards;
   animation: fadeInUp 0.8s ease-out forwards;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  will-change: opacity, transform;
 }
 
 .animate-text {
   opacity: 0;
-  -webkit-animation: fadeInUp 0.8s ease-out 0.3s forwards;
-  -moz-animation: fadeInUp 0.8s ease-out 0.3s forwards;
-  -o-animation: fadeInUp 0.8s ease-out 0.3s forwards;
   animation: fadeInUp 0.8s ease-out 0.3s forwards;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  will-change: opacity, transform;
 }
 
 .animate-created {
   opacity: 0;
-  -webkit-animation: fadeInUp 0.8s ease-out 0.5s forwards;
-  -moz-animation: fadeInUp 0.8s ease-out 0.5s forwards;
-  -o-animation: fadeInUp 0.8s ease-out 0.5s forwards;
   animation: fadeInUp 0.8s ease-out 0.5s forwards;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  will-change: opacity, transform;
 }
 
 .animate-button {
   opacity: 0;
-  -webkit-animation: fadeInLeft 0.8s ease-out 0.7s forwards;
-  -moz-animation: fadeInLeft 0.8s ease-out 0.7s forwards;
-  -o-animation: fadeInLeft 0.8s ease-out 0.7s forwards;
   animation: fadeInLeft 0.8s ease-out 0.7s forwards;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  will-change: opacity, transform;
 }
 
 .button-hover-glow {
-  -webkit-transition: all 0.3s ease;
-  -moz-transition: all 0.3s ease;
-  -ms-transition: all 0.3s ease;
-  -o-transition: all 0.3s ease;
-  transition: all 0.3s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
   position: relative;
   overflow: hidden;
-  will-change: transform;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
 }
 
 .button-hover-glow:hover {
-  -webkit-transform: scale3d(1.05, 1.05, 1);
-  -moz-transform: scale3d(1.05, 1.05, 1);
-  -ms-transform: scale3d(1.05, 1.05, 1);
-  -o-transform: scale3d(1.05, 1.05, 1);
-  transform: scale3d(1.05, 1.05, 1);
+  transform: scale(1.05);
   box-shadow: 0 0 20px rgba(143, 254, 131, 0.6), 0 0 40px rgba(143, 254, 131, 0.4);
   background-color: #7ae570;
 }
 
 .button-hover-glow:active {
-  -webkit-transform: scale3d(0.98, 0.98, 1);
-  -moz-transform: scale3d(0.98, 0.98, 1);
-  -ms-transform: scale3d(0.98, 0.98, 1);
-  -o-transform: scale3d(0.98, 0.98, 1);
-  transform: scale3d(0.98, 0.98, 1);
+  transform: scale(0.98);
 }
 
 .button-press {
@@ -306,29 +188,20 @@ onUnmounted(() => {
   width: 0;
   height: 0;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.5);
-  -webkit-transform: translate3d(-50%, -50%, 0);
-  -moz-transform: translate3d(-50%, -50%, 0);
-  -ms-transform: translate3d(-50%, -50%, 0);
-  -o-transform: translate3d(-50%, -50%, 0);
-  transform: translate3d(-50%, -50%, 0);
-  -webkit-transition: width 0.6s, height 0.6s;
-  -moz-transition: width 0.6s, height 0.6s;
-  -ms-transition: width 0.6s, height 0.6s;
-  -o-transition: width 0.6s, height 0.6s;
-  transition: width 0.6s, height 0.6s;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .button-press:active::after {
-  width: 300px;
-  height: 300px;
+  width: 150px;
+  height: 150px;
+  opacity: 1;
 }
 
 .link-hover-glow {
-  -webkit-transition: color 0.2s ease, text-shadow 0.2s ease;
-  -moz-transition: color 0.2s ease, text-shadow 0.2s ease;
-  -ms-transition: color 0.2s ease, text-shadow 0.2s ease;
-  -o-transition: color 0.2s ease, text-shadow 0.2s ease;
   transition: color 0.2s ease, text-shadow 0.2s ease;
   text-decoration: none;
   position: relative;
@@ -344,6 +217,16 @@ onUnmounted(() => {
 .flex.flex-col {
   position: relative;
   z-index: 10;
+}
+
+/* Performance optimizations */
+.absolute.inset-0 {
+  contain: layout style paint;
+  transform: translateZ(0);
+}
+
+.absolute.inset-0 svg {
+  isolation: isolate;
 }
 
 </style>
