@@ -13,6 +13,8 @@ const props = defineProps({
   }
 })
 
+const emit = defineEmits(['bar-click'])
+
 // Get unique event types from the events
 const eventTypes = computed(() => {
   const unique = [...new Set(props.events.map(e => e.eventName))]
@@ -230,6 +232,7 @@ const getLabel = (item) => {
                 height: `${(item.count / maxValue) * 100}%`
               }"
               :title="mode === 'highscores' ? `${item.count} ${item.label} events` : `${item.count} on ${item.dayName}`"
+              @click="emit('bar-click', { mode, item, selectedEvent: mode === 'filtered' ? selectedEvent : null })"
             >
               <span class="bar-value">{{ item.count }}</span>
               <template v-if="mode !== 'highscores' && isCurrentDay(item.dayName)">

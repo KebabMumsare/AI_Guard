@@ -1,10 +1,15 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import BlockGraph from '../components/BlockGraph.vue'
 import PageTitle from '../components/PageTitle.vue'
 import mockData from '../data/mockData.json'
+import { Chart, registerables } from 'chart.js'
+
+Chart.register(...registerables)
 
 const events = ref(Array.isArray(mockData) ? mockData : [])
+const chartCanvas = ref(null)
+const chartInstance = ref(null)
 
 // Log state variables
 const logs = ref([])
@@ -58,16 +63,213 @@ const formatDate = (dateString) => {
   return new Date(dateString).toLocaleString()
 }
 
+// Line graph data processing
+const processHourlyData = (date, eventType) => {
+  const filteredEvents = events.value.filter(e => {
+    const eventDate = new Date(e.timestamp)
+    const eventDateStr = eventDate.toISOString().split('T')[0]
+    if (eventDateStr !== date) return false
+    
+    if (eventType === 'TOTAL') return true
+    return e.eventName === eventType
+  })
+  
+  // Group by hour (UTC)
+  const hourlyData = Array(24).fill(0)
+  filteredEvents.forEach(event => {
+    const eventDate = new Date(event.timestamp)
+    const hour = eventDate.getUTCHours()
+    hourlyData[hour]++
+  })
+  
+  const labels = Array.from({ length: 24 }, (_, i) => {
+    const hour = i.toString().padStart(2, '0')
+    return `${hour}:00`
+  })
+  
+  return {
+    labels,
+    data: hourlyData
+  }
+}
+
+const processDailyData = (eventType) => {
+  const filteredEvents = events.value.filter(e => e.eventName === eventType)
+  
+  if (filteredEvents.length === 0) {
+    return { labels: [], data: [] }
+  }
+  
+  // Find first and last occurrence
+  const sortedEvents = [...filteredEvents].sort((a, b) => 
+    new Date(a.timestamp) - new Date(b.timestamp)
+  )
+  
+  const firstDate = new Date(sortedEvents[0].timestamp)
+  firstDate.setHours(0, 0, 0, 0)
+  const lastDate = new Date()
+  lastDate.setHours(23, 59, 59, 999)
+  
+  // Group by date
+  const dailyData = {}
+  filteredEvents.forEach(event => {
+    const date = new Date(event.timestamp)
+    date.setHours(0, 0, 0, 0)
+    const dateKey = date.toISOString().split('T')[0]
+    dailyData[dateKey] = (dailyData[dateKey] || 0) + 1
+  })
+  
+  // Create array for all days from first to current
+  const labels = []
+  const data = []
+  const current = new Date(firstDate)
+  
+  while (current <= lastDate) {
+    const dateKey = current.toISOString().split('T')[0]
+    const formattedDate = new Date(dateKey).toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric' 
+    })
+    labels.push(formattedDate)
+    data.push(dailyData[dateKey] || 0)
+    current.setDate(current.getDate() + 1)
+  }
+  
+  return { labels, data }
+}
+
+const handleBarClick = async (payload) => {
+  const { mode, item, selectedEvent } = payload
+  
+  let chartData
+  
+  if (mode === 'highscores') {
+    // All-time view - show daily data from first occurrence
+    chartData = processDailyData(item.label)
+  } else {
+    // Filtered mode - show hourly data for selected day
+    chartData = processHourlyData(item.date, selectedEvent)
+  }
+  
+  // Have to wait for the next tick to ensure that the canvas is ready (after DOM is loaded)
+  await nextTick()
+  updateChart(chartData)
+}
+
+const updateChart = (chartData) => {
+  if (!chartCanvas.value) return
+  
+  if (chartData.labels.length === 0 || chartData.data.length === 0) {
+    if (chartInstance.value) {
+      chartInstance.value.destroy()
+      chartInstance.value = null
+    }
+    return
+  }
+  
+  if (chartInstance.value) {
+    chartInstance.value.destroy()
+  }
+  
+  chartInstance.value = new Chart(chartCanvas.value, {
+    type: 'line',
+    data: {
+      labels: chartData.labels,
+      datasets: [{
+        label: '',
+        data: chartData.data,
+        borderColor: '#8ffe83',
+        backgroundColor: 'transparent',
+        borderWidth: 2,
+        pointRadius: 0,
+        pointHoverRadius: 4,
+        pointHoverBackgroundColor: '#8ffe83',
+        pointHoverBorderColor: '#8ffe83',
+        tension: 0.2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: false
+        },
+        tooltip: {
+          enabled: true,
+          backgroundColor: '#37393B',
+          titleColor: '#8ffe83',
+          bodyColor: '#ffffff',
+          borderColor: '#8ffe83',
+          borderWidth: 1,
+          padding: 8
+        }
+      },
+      scales: {
+        x: {
+          display: true,
+          ticks: {
+            color: '#8ffe83',
+            font: {
+              size: 11
+            },
+            maxRotation: 45,
+            minRotation: 0,
+            maxTicksLimit: 12
+          },
+          grid: {
+            display: false
+          },
+          border: {
+            display: false
+          },
+          padding: {
+            left: 10,
+            right: 10
+          }
+        },
+        y: {
+          display: true,
+          beginAtZero: true,
+          min: 0,
+          ticks: {
+            color: '#8ffe83',
+            font: {
+              size: 11
+            },
+            padding: 10,
+            stepSize: 1
+          },
+          grid: {
+            display: false
+          },
+          border: {
+            display: false
+          },
+          padding: {
+            top: 10,
+            bottom: 10
+          }
+        }
+      }
+    }
+  })
+}
+
 
 // When the component loads...
 onMounted(() => {
   fetchLogs(currentPage.value)
   // Refresh current page every 10 seconds
   intervalId = setInterval(() => fetchLogs(currentPage.value), 10000)
+  
 })
 
 onUnmounted(() => {
   if (intervalId) clearInterval(intervalId)
+  if (chartInstance.value) {
+    chartInstance.value.destroy()
+  }
 })
 </script>
 
@@ -78,9 +280,13 @@ onUnmounted(() => {
     <div class="content-wrapper">
       <div class="graphs-section">
         <div class="graphs-container">
-          <BlockGraph :events="events" mode="filtered" />
-          <BlockGraph :events="events" mode="highscores" />
+          <BlockGraph :events="events" mode="filtered" @bar-click="handleBarClick" />
+          <BlockGraph :events="events" mode="highscores" @bar-click="handleBarClick" />
         </div>
+      </div>
+      
+      <div class="line-graph-section">
+        <canvas ref="chartCanvas" width="400" height="300"></canvas>
       </div>
       
       <div class="sidebar-section">
@@ -175,6 +381,24 @@ onUnmounted(() => {
   min-height: 0; /* Important for flex children to respect overflow */
   box-sizing: border-box;
   justify-content: space-between;
+  align-items: stretch;
+}
+
+.line-graph-section {
+  flex: 1;
+  min-width: 0;
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.line-graph-section canvas {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 300px;
+  max-height: 100%;
 }
 
 .graphs-section {
@@ -481,12 +705,19 @@ onUnmounted(() => {
     gap: 1vh;
   }
   
+  .line-graph-section {
+    height: 30vh;
+    min-height: 200px;
+    order: 2;
+  }
+  
   .sidebar-section {
     width: 100%;
     min-width: unset;
     max-width: none;
     height: 40vh;
     max-height: 40vh;
+    order: 3;
   }
   
   .log-container {
@@ -531,6 +762,7 @@ onUnmounted(() => {
   
   .graphs-section {
     align-items: stretch;
+    order: 1;
   }
   
 }
