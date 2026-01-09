@@ -1,13 +1,18 @@
 <script setup>
-import { onMounted, ref, nextTick, watch } from 'vue'
+import { onMounted, onUnmounted, ref, nextTick, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { gsap } from 'gsap'
 import Navbar from './components/Navbar.vue'
+import NotificationBox from './components/NotificationBox.vue'
+import { useNotifications } from './composables/useNotifications'
 import MatrixBG from './Assets/MatrixBG.mp4'
 
 const videoRef = ref(null)
 const route = useRoute()
 const isVideoReady = ref(false)
+
+// Initialize notification system
+const { startNotifications, stopNotifications } = useNotifications()
 
 const setPlaybackSpeed = (event) => {
   const video = event?.target || videoRef.value
@@ -51,6 +56,13 @@ onMounted(async () => {
     setTimeout(() => setPlaybackSpeed({ target: videoRef.value }), 500)
     setTimeout(() => setPlaybackSpeed({ target: videoRef.value }), 1000)
   }
+  // Start notification system
+  startNotifications()
+})
+
+onUnmounted(() => {
+  // Clean up notification system
+  stopNotifications()
 })
 </script>
 
@@ -85,6 +97,9 @@ onMounted(async () => {
       <Navbar />
       <router-view />
     </div>
+    
+    <!-- Notification System - App-wide -->
+    <NotificationBox />
   </div>
 </template>
 
