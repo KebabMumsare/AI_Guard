@@ -56,10 +56,7 @@ onMounted(() => {
       <div class="video-section">
         <div class="video-container relative w-full bg-black overflow-hidden">
           <div class="w-full h-full flex items-center justify-center bg-black" style="aspect-ratio: 16/9; min-height: 400px;">
-            <div class="text-center">
-              <div class="text-[#8ffe83] text-lg sm:text-xl md:text-2xl mb-2">Camera Feed</div>
-              <div class="text-gray-400 text-sm sm:text-base">Video stream will appear here</div>
-            </div>
+            <img src="http://192.168.50.26:5000/video_feed" alt="Camera Stream" class="w-full h-full object-contain">
           </div>
           
           <div class="absolute top-4 left-4 flex items-center gap-2 bg-black bg-opacity-70 px-3 py-1.5 rounded-md">
