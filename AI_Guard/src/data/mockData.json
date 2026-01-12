@@ -343,6 +343,48 @@
   },
   {
     "eventName": "XXX",
+    "timestamp": "2026-01-11T09:15:12.123Z",
+    "accuracy": 87.2,
+    "screenshot": null
+  },
+  {
+    "eventName": "YYY",
+    "timestamp": "2026-01-11T14:30:45.456Z",
+    "accuracy": 90.6,
+    "screenshot": null
+  },
+  {
+    "eventName": "ZZZ",
+    "timestamp": "2026-01-11T18:45:28.789Z",
+    "accuracy": 85.9,
+    "screenshot": null
+  },
+  {
+    "eventName": "XXX",
+    "timestamp": "2026-01-12T07:30:15.123Z",
+    "accuracy": 91.3,
+    "screenshot": null
+  },
+  {
+    "eventName": "YYY",
+    "timestamp": "2026-01-12T10:45:42.456Z",
+    "accuracy": 88.7,
+    "screenshot": null
+  },
+  {
+    "eventName": "ZZZ",
+    "timestamp": "2026-01-12T14:20:28.789Z",
+    "accuracy": 86.1,
+    "screenshot": null
+  },
+  {
+    "eventName": "XXX",
+    "timestamp": "2026-01-12T17:55:51.234Z",
+    "accuracy": 92.4,
+    "screenshot": null
+  },
+  {
+    "eventName": "XXX",
     "timestamp": "2026-01-13T08:15:22.123Z",
     "accuracy": 88.7,
     "screenshot": null

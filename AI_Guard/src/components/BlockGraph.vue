@@ -235,12 +235,19 @@ const getLabel = (item) => {
               @click="emit('bar-click', { mode, item, selectedEvent: mode === 'filtered' ? selectedEvent : null })"
             >
               <span class="bar-value">{{ item.count }}</span>
+              <!-- Star on bar when today has data -->
               <template v-if="mode !== 'highscores' && isCurrentDay(item.dayName)">
                 <span class="center-star"></span>
                 <span v-for="n in 5" :key="n" :class="['star-glow-layer', `star-glow-${n}`]"></span>
               </template>
             </div>
-            <div v-else class="bar-empty"></div>
+            <!-- Empty bar with star when today has 0 events -->
+            <div v-else class="bar-empty" :class="{ 'bar-empty-current': mode !== 'highscores' && isCurrentDay(item.dayName) }">
+              <template v-if="mode !== 'highscores' && isCurrentDay(item.dayName)">
+                <span class="center-star"></span>
+                <span v-for="n in 5" :key="n" :class="['star-glow-layer', `star-glow-${n}`]"></span>
+              </template>
+            </div>
           </div>
         </div>
       </div>
@@ -460,6 +467,7 @@ const getLabel = (item) => {
   animation: star-pulse 1s ease-in-out infinite;
 }
 
+
 .center-star {
   animation: star-pulse 1s ease-in-out infinite;
 }
@@ -527,6 +535,11 @@ const getLabel = (item) => {
 
 .bar-empty {
   width: 35%;
+  position: relative;
+}
+
+.bar-empty-current {
+  min-height: 20px;
 }
 
 .labels-container {
