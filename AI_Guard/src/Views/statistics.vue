@@ -409,7 +409,6 @@ onUnmounted(() => {
   min-height: 0;
   min-width: 0;
   height: 100%;
-  padding-right: 1vw;
 }
 
 /* Custom scrollbar for graphs section */
