@@ -268,14 +268,16 @@ const getLabel = (item) => {
 
 <style scoped>
 .block-graph {
-  background-color: #2a2a2a;
-  border-radius: clamp(8px, 1.2vw, 12px);
+  background-color: #37393B;
+  border: 3px solid rgba(143, 254, 131, 0.2);
+  border-radius: 0;
   padding: clamp(1rem, 2vh, 20px);
   display: flex;
   flex-direction: column;
   width: clamp(300px, 45vw, 600px);
   flex: 1;
   min-height: 350px;
+  box-shadow: 0.5rem 0.5rem 0 rgba(0, 0, 0, 0.3);
 }
 
 @media (max-width: 1080px) {
@@ -288,6 +290,8 @@ const getLabel = (item) => {
 
 .graph-header {
   margin-bottom: clamp(0.8rem, 1.5vh, 16px);
+  padding-bottom: clamp(0.6rem, 1vh, 12px);
+  border-bottom: 2px solid rgba(143, 254, 131, 0.2);
 }
 
 .event-badges {
@@ -299,39 +303,40 @@ const getLabel = (item) => {
 .graph-title-text {
   color: #8ffe83;
   font-size: clamp(1rem, 1.8vw, 18px);
-  font-weight: 600;
+  font-weight: bold;
 }
 
 .event-badge {
-  padding: clamp(0.4rem, 1vh, 8px) clamp(1rem, 2vw, 20px);
-  background-color: rgba(143, 254, 131, 0.1);
+  padding: clamp(0.4rem, 0.8vh, 8px) clamp(0.8rem, 1.5vw, 16px);
+  background-color: rgba(0, 0, 0, 0.3);
   color: #8ffe83;
-  border: 2px solid rgba(143, 254, 131, 0.3);
-  border-radius: 9999px;
+  border: 2px solid rgba(143, 254, 131, 0.2);
+  border-radius: 0;
   font-size: clamp(0.75rem, 1.4vw, 14px);
   font-weight: 600;
   cursor: pointer;
-  -webkit-transition: all 0.3s ease;
-  -moz-transition: all 0.3s ease;
-  -ms-transition: all 0.3s ease;
-  -o-transition: all 0.3s ease;
-  transition: all 0.3s ease;
+  -webkit-transition: all 0.2s ease;
+  -moz-transition: all 0.2s ease;
+  -ms-transition: all 0.2s ease;
+  -o-transition: all 0.2s ease;
+  transition: all 0.2s ease;
   white-space: nowrap;
-  will-change: transform, background-color, border-color;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
+  box-shadow: 0.25rem 0.25rem 0 rgba(0, 0, 0, 0.2);
 }
 
 .event-badge:hover {
-  background-color: rgba(143, 254, 131, 0.2);
-  border-color: rgba(143, 254, 131, 0.6);
+  background-color: rgba(143, 254, 131, 0.15);
+  border-color: rgba(143, 254, 131, 0.4);
+  transform: translate(-2px, -2px);
+  box-shadow: 0.35rem 0.35rem 0 rgba(0, 0, 0, 0.25);
 }
 
 .event-badge.active {
-  background: linear-gradient(to top, #4a8a42, #6fcf64, #8ffe83);
-  color: #ffffff;
+  background-color: #8ffe83;
+  color: #000000;
   border-color: #8ffe83;
-  box-shadow: 0 2px 8px rgba(143, 254, 131, 0.3);
+  font-weight: bold;
+  box-shadow: 0.25rem 0.25rem 0 rgba(0, 0, 0, 0.3);
 }
 
 .graph-wrapper {
@@ -392,7 +397,7 @@ const getLabel = (item) => {
   left: 0;
   right: 0;
   height: 1px;
-  background-color: rgba(143, 254, 131, 0.3);
+  background-color: rgba(143, 254, 131, 0.15);
 }
 
 .bar-wrapper {
@@ -547,8 +552,10 @@ const getLabel = (item) => {
   justify-content: space-between;
   gap: clamp(0.5rem, 1.2vw, 12px);
   height: clamp(18px, 2.4vh, 24px);
-  margin-top: clamp(0.3rem, 0.6vh, 6px);
+  margin-top: clamp(0.5rem, 1vh, 10px);
+  padding-top: clamp(0.4rem, 0.8vh, 8px);
   padding-left: clamp(1rem, 2vw, 20px); /* Match Y-axis width + gap */
+  border-top: 2px solid rgba(143, 254, 131, 0.2);
 }
 
 .day-label {
@@ -556,7 +563,7 @@ const getLabel = (item) => {
   font-size: clamp(0.6rem, 1.1vw, 11px);
   color: #8ffe83;
   text-align: center;
-  font-weight: 500;
+  font-weight: 600;
   text-transform: capitalize;
 }
 </style>
