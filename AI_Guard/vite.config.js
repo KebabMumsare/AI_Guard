@@ -17,7 +17,7 @@ export default defineConfig({
   },
   // Server configuration for local development
   server: {
-    host: '192.168.50.161',
+    host: 'localhost',
     port: 5000,
     proxy: {
       
@@ -25,7 +25,7 @@ export default defineConfig({
       // This allows us to use relative paths (e.g. fetch('/api/logs')) in the frontend
       // which works seamlessly both locally and on the Pi (via Nginx)
       '/api': {
-        target: '192.168.50.161:3000',
+        target: 'http://localhost:3000',
         changeOrigin: true,
       },
     },
