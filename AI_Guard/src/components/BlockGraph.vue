@@ -277,7 +277,7 @@ const getLabel = (item) => {
   width: clamp(300px, 45vw, 600px);
   flex: 1;
   min-height: 350px;
-  box-shadow: 0.5rem 0.5rem 0 rgba(0, 0, 0, 0.3);
+  box-shadow: 0.625rem 0.625rem 0 rgba(0, 0, 0, 0.3);
 }
 
 @media (max-width: 1080px) {

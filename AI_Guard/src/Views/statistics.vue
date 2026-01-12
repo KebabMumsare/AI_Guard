@@ -382,6 +382,8 @@ onUnmounted(() => {
   box-sizing: border-box;
   justify-content: space-between;
   align-items: stretch;
+  padding-right: 0.625rem; /* Space for box shadows */
+  padding-bottom: 0.625rem;
 }
 
 .line-graph-section {
@@ -392,6 +394,11 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   position: relative;
+  background-color: #37393B;
+  border: 3px solid rgba(143, 254, 131, 0.2);
+  padding: clamp(1rem, 2vh, 20px);
+  box-shadow: 0.625rem 0.625rem 0 rgba(0, 0, 0, 0.3);
+  box-sizing: border-box;
 }
 
 .line-graph-section canvas {
@@ -409,6 +416,7 @@ onUnmounted(() => {
   min-height: 0;
   min-width: 0;
   height: 100%;
+  padding-right: 0.625rem; /* Space for box shadows */
 }
 
 /* Custom scrollbar for graphs section */
@@ -426,7 +434,7 @@ onUnmounted(() => {
 .graphs-container {
   display: flex;
   flex-direction: column;
-  gap: 1.5vh;
+  gap: calc(1.5vw + 0.625rem); /* Extra gap for box shadows */
   width: fit-content;
   min-width: clamp(300px, 45vw, 600px);
   flex: 1;
