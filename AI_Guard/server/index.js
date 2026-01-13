@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import db from './database.js';
+import bcrypt from 'bcrypt';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -10,6 +11,65 @@ app.use(cors()); // Allow requests from other domains (like the frontend)
 app.use(express.json()); // Parse incoming JSON data
 
 // --- API Endpoints ---
+
+// 0. Authentication
+// Register a new user
+app.post('/api/register', async (req, res) => {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+        return res.status(400).json({ error: 'Username and password are required' });
+    }
+
+    try {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const sql = `INSERT INTO users (username, password) VALUES (?, ?)`;
+
+        db.run(sql, [username, hashedPassword], function (err) {
+            if (err) {
+                if (err.message.includes('UNIQUE constraint failed')) {
+                    return res.status(409).json({ error: 'Username already exists' });
+                }
+                return res.status(500).json({ error: err.message });
+            }
+            res.status(201).json({ message: 'User registered successfully', userId: this.lastID });
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Error registering user' });
+    }
+});
+
+// Login user
+app.post('/api/login', (req, res) => {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+        return res.status(400).json({ error: 'Username and password are required' });
+    }
+
+    const sql = `SELECT * FROM users WHERE username = ?`;
+
+    db.get(sql, [username], async (err, user) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        if (!user) {
+            return res.status(401).json({ error: 'Invalid credentials' });
+        }
+
+        try {
+            const match = await bcrypt.compare(password, user.password);
+            if (match) {
+                // In a real app, we would generate a JWT token here
+                res.json({ message: 'Login successful', user: { id: user.id, username: user.username } });
+            } else {
+                res.status(401).json({ error: 'Invalid credentials' });
+            }
+        } catch (error) {
+            res.status(500).json({ error: 'Error verifying credentials' });
+        }
+    });
+});
 
 // 1. Log an Event
 // Receives data from the Camera/Jetson Nano and saves it to the database.
