@@ -63,22 +63,30 @@ const formatDate = (dateString) => {
   return new Date(dateString).toLocaleString()
 }
 
+// Helper to get local date string (YYYY-MM-DD) without timezone shift
+const getLocalDateString = (date) => {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 // Line graph data processing
 const processHourlyData = (date, eventType) => {
   const filteredEvents = events.value.filter(e => {
     const eventDate = new Date(e.timestamp)
-    const eventDateStr = eventDate.toISOString().split('T')[0]
+    const eventDateStr = getLocalDateString(eventDate)
     if (eventDateStr !== date) return false
     
     if (eventType === 'TOTAL') return true
     return e.eventName === eventType
   })
   
-  // Group by hour (UTC)
+  // Group by hour (local time)
   const hourlyData = Array(24).fill(0)
   filteredEvents.forEach(event => {
     const eventDate = new Date(event.timestamp)
-    const hour = eventDate.getUTCHours()
+    const hour = eventDate.getHours()
     hourlyData[hour]++
   })
   
@@ -256,13 +264,22 @@ const updateChart = (chartData) => {
   })
 }
 
+// Initialize the default line graph with today's total events
+const initializeDefaultChart = () => {
+  const today = getLocalDateString(new Date())
+  const chartData = processHourlyData(today, 'TOTAL')
+  updateChart(chartData)
+}
 
 // When the component loads...
-onMounted(() => {
+onMounted(async () => {
   fetchLogs(currentPage.value)
   // Refresh current page every 10 seconds
   intervalId = setInterval(() => fetchLogs(currentPage.value), 10000)
   
+  // Initialize the default line graph after DOM is ready
+  await nextTick()
+  initializeDefaultChart()
 })
 
 onUnmounted(() => {

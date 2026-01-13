@@ -21,16 +21,9 @@ const eventTypes = computed(() => {
   return unique.sort()
 })
 
-// Selected event (defaults to first event type) - only used in 'filtered' mode
+// Selected event (defaults to 'TOTAL' to show all events combined) - only used in 'filtered' mode
 // 'TOTAL' is a special value that means show all events combined
-const selectedEvent = ref('')
-
-// Initialize selectedEvent when eventTypes are available
-watch(eventTypes, (newTypes) => {
-  if (newTypes.length > 0 && !newTypes.includes(selectedEvent.value) && selectedEvent.value !== 'TOTAL') {
-    selectedEvent.value = newTypes[0]
-  }
-}, { immediate: true })
+const selectedEvent = ref('TOTAL')
 
 // Check if showing total events
 const isTotalEvents = computed(() => selectedEvent.value === 'TOTAL')
