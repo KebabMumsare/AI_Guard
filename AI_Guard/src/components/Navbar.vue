@@ -1,12 +1,12 @@
 <template>
   <nav class="navbar">
-    <router-link to="/admin" class="nav-link">Admin</router-link>
+    <router-link to="/home" class="nav-link">Home</router-link>
     <span class="separator">|</span>
     <router-link to="/statistics" class="nav-link">Statistics</router-link>
     <span class="separator">|</span>
-    <router-link to="/home" class="nav-link">Home</router-link>
-    <span class="separator">|</span>
     <router-link to="/live" class="nav-link">Live</router-link>
+    <span class="separator">|</span>
+    <router-link to="/admin" class="nav-link">Admin</router-link>
   </nav>
 </template>
 
