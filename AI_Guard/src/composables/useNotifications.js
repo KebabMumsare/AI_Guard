@@ -42,11 +42,7 @@ const generateNotification = () => {
 const addNotification = () => {
   const notification = generateNotification()
   notifications.value.push(notification)
-  
-  // Auto-remove after 3 seconds
-  setTimeout(() => {
-    removeNotification(notification.id)
-  }, 3000)
+  // Removal is now handled by the NotificationBox component after animation completes
 }
 
 // Remove a notification by ID
