@@ -179,6 +179,11 @@ const updateChart = (chartData) => {
     chartInstance.value.destroy()
   }
   
+  // Calculate max value: highest value + 10, rounded up to nearest 10 (same as block graph)
+  const maxDataValue = Math.max(...chartData.data, 0)
+  const valueWithPadding = maxDataValue + 10
+  const yAxisMax = Math.round(valueWithPadding / 10) * 10 || 10
+  
   chartInstance.value = new Chart(chartCanvas.value, {
     type: 'line',
     data: {
@@ -240,6 +245,7 @@ const updateChart = (chartData) => {
           display: true,
           beginAtZero: true,
           min: 0,
+          max: yAxisMax,
           ticks: {
             color: '#8ffe83',
             font: {
