@@ -2,27 +2,25 @@ import { ref } from 'vue'
 
 const notifications = ref([])
 let pollingId = null
-let lastLogId = 0
 
-const fetchNewLogs = async () => {
+// Jetson IP - same as video feed
+const JETSON_URL = 'http://192.168.50.26:5500/events'
+
+const fetchEvents = async () => {
   try {
-    const res = await fetch('http://localhost:3000/api/logs?limit=10')
-    const data = await res.json()
-    
-    for (const log of data.logs) {
-      if (log.id > lastLogId) {
-        notifications.value.push({
-          id: log.id,
-          event_type: log.event_type,
-          description: log.description,
-          camera_id: log.camera_id,
-          timestamp: log.timestamp
-        })
-        lastLogId = log.id
-      }
+    const res = await fetch(JETSON_URL)
+    const events = await res.json()
+    for (const event of events) {
+      notifications.value.push({
+        id: Date.now() + Math.random(),
+        event_type: event.event_type,
+        description: event.description,
+        camera_id: event.camera_id,
+        timestamp: new Date(event.timestamp * 1000).toISOString()
+      })
     }
   } catch (e) {
-    // Server unavailable
+    // Jetson unavailable
   }
 }
 
@@ -33,17 +31,8 @@ const removeNotification = (id) => {
   }
 }
 
-const startNotifications = async () => {
-  // Initialize lastLogId to current max
-  try {
-    const res = await fetch('http://localhost:3000/api/logs?limit=1')
-    const data = await res.json()
-    if (data.logs.length > 0) {
-      lastLogId = data.logs[0].id
-    }
-  } catch (e) {}
-  
-  pollingId = setInterval(fetchNewLogs, 1000)
+const startNotifications = () => {
+  pollingId = setInterval(fetchEvents, 1000)
 }
 
 const stopNotifications = () => {
