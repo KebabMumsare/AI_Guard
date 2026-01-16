@@ -39,7 +39,7 @@ onUnmounted(() => {
     </div>
     <div class="h-[20vh] sm:h-[25vh] md:h-[30vh] lg:h-[50vh] w-full sm:w-[85%] md:w-[75%] lg:w-[60vh] xl:w-[60vh] bg-black rounded-md overflow-hidden flex-shrink-0 relative z-10 mx-auto lg:mx-0">
       <div class="w-full h-full flex items-center justify-center bg-black">
-        <img src="http://192.168.50.26:5000/video_feed" alt="Camera Stream" class="w-full h-full object-contain">
+        <img src="http://192.168.50.26:5500/video_feed" alt="Camera Stream" class="w-full h-full object-contain">
       </div>
       
       <div class="absolute top-1 sm:top-2 left-1 sm:left-2 flex items-center gap-1 sm:gap-2 bg-black bg-opacity-70 px-1.5 sm:px-2 md:px-3 py-0.5 sm:py-1 md:py-1.5 rounded-md">
