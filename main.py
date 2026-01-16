@@ -4,6 +4,9 @@ import argparse
 import os
 import time
 import mediapipe as mp
+import requests
+
+SERVER_URL = "http://localhost:3000/api/log"
 
 def open_usb(index, width, height, fps):
     cap = cv2.VideoCapture(index, cv2.CAP_V4L2)
@@ -84,7 +87,16 @@ def main():
             if is_fist(lms, h, w):
                 label = "ROCK (FIST)"
                 if not fist_state:
-                    print("ROCK detected")
+                    print("ROCK detected - sending to server...")
+                    try:
+                        r = requests.post(SERVER_URL, json={
+                            "event_type": "Fist Detected",
+                            "description": "Fist gesture detected by camera",
+                            "camera_id": "Camera 1"
+                        }, timeout=2)
+                        print(f"Server response: {r.status_code}")
+                    except Exception as e:
+                        print(f"Failed to send: {e}")
                 fist_state = True
             else:
                 fist_state = False

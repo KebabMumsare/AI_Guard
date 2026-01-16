@@ -1,51 +1,31 @@
 import { ref } from 'vue'
 
 const notifications = ref([])
-let intervalId = null
+let pollingId = null
+let lastLogId = 0
 
-// Mock event types and descriptions
-const eventTypes = [
-  'Motion Detected',
-  'Person Detected',
-  'Alert',
-  'Security Breach',
-  'Unauthorized Access',
-  'Object Detected'
-]
-
-const descriptions = [
-  'Movement detected in camera view',
-  'Person identified in restricted area',
-  'Security alert triggered',
-  'Potential security breach detected',
-  'Unauthorized access attempt',
-  'Unknown object detected'
-]
-
-const cameraIds = ['Camera 1', 'Camera 2', 'Camera 3', 'Camera 4', 'Camera 5']
-
-// Generate a random notification
-const generateNotification = () => {
-  const eventTypeIndex = Math.floor(Math.random() * eventTypes.length)
-  const cameraIndex = Math.floor(Math.random() * cameraIds.length)
-  
-  return {
-    id: Date.now() + Math.random(),
-    event_type: eventTypes[eventTypeIndex],
-    description: descriptions[eventTypeIndex],
-    camera_id: cameraIds[cameraIndex],
-    timestamp: new Date().toISOString()
+const fetchNewLogs = async () => {
+  try {
+    const res = await fetch('http://localhost:3000/api/logs?limit=10')
+    const data = await res.json()
+    
+    for (const log of data.logs) {
+      if (log.id > lastLogId) {
+        notifications.value.push({
+          id: log.id,
+          event_type: log.event_type,
+          description: log.description,
+          camera_id: log.camera_id,
+          timestamp: log.timestamp
+        })
+        lastLogId = log.id
+      }
+    }
+  } catch (e) {
+    // Server unavailable
   }
 }
 
-// Add a new notification
-const addNotification = () => {
-  const notification = generateNotification()
-  notifications.value.push(notification)
-  // Removal is now handled by the NotificationBox component after animation completes
-}
-
-// Remove a notification by ID
 const removeNotification = (id) => {
   const index = notifications.value.findIndex(n => n.id === id)
   if (index > -1) {
@@ -53,33 +33,31 @@ const removeNotification = (id) => {
   }
 }
 
-// Start the notification system with random intervals (7-10 seconds)
-const startNotifications = () => {
-  const scheduleNext = () => {
-    const delay = Math.random() * 3000 + 7000 // 7-10 seconds
-    intervalId = setTimeout(() => {
-      addNotification()
-      scheduleNext()
-    }, delay)
-  }
-  scheduleNext()
+const startNotifications = async () => {
+  // Initialize lastLogId to current max
+  try {
+    const res = await fetch('http://localhost:3000/api/logs?limit=1')
+    const data = await res.json()
+    if (data.logs.length > 0) {
+      lastLogId = data.logs[0].id
+    }
+  } catch (e) {}
+  
+  pollingId = setInterval(fetchNewLogs, 1000)
 }
 
-// Stop the notification system
 const stopNotifications = () => {
-  if (intervalId) {
-    clearTimeout(intervalId)
-    intervalId = null
+  if (pollingId) {
+    clearInterval(pollingId)
+    pollingId = null
   }
 }
 
 export function useNotifications() {
   return {
     notifications,
-    addNotification,
     removeNotification,
     startNotifications,
     stopNotifications
   }
 }
-
