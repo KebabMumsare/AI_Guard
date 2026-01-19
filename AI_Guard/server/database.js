@@ -21,9 +21,7 @@ function initDatabase() {
         db.run(`CREATE TABLE IF NOT EXISTS logs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       event_type TEXT NOT NULL,
-      description TEXT,
-      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-      camera_id TEXT
+      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
     )`);
 
         // Create users table

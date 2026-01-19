@@ -1,19 +1,19 @@
 import db from './database.js';
 
 const sampleLogs = [
-    { event_type: 'Person Detected', description: 'Person identified as Eliah', camera_id: 'CAM-01' },
-    { event_type: 'Person Detected', description: 'Person identified as Carl', camera_id: 'CAM-01' },
-    { event_type: 'Person Detected', description: 'Person identified as Mykyta', camera_id: 'CAM-01' },
-    { event_type: 'Person Detected', description: 'Person identified as Jesper', camera_id: 'CAM-01' },
-    { event_type: 'Person Detected', description: 'Person identified as Andi', camera_id: 'CAM-01' },
-    { event_type: 'Person Detected', description: 'Person identified as Eliah', camera_id: 'CAM-01' },
-    { event_type: 'Person Detected', description: 'Person identified as Carl', camera_id: 'CAM-01' }
+    { event_type: 'Rock_FIST' },
+    { event_type: 'Rock_FIST' },
+    { event_type: 'Rock_FIST' },
+    { event_type: 'Rock_FIST' },
+    { event_type: 'Rock_FIST' },
+    { event_type: 'Rock_FIST' },
+    { event_type: 'Rock_FIST' }
 ];
 
 const insertLog = (log) => {
     return new Promise((resolve, reject) => {
-        const sql = `INSERT INTO logs (event_type, description, camera_id) VALUES (?, ?, ?)`;
-        db.run(sql, [log.event_type, log.description, log.camera_id], function (err) {
+        const sql = `INSERT INTO logs (event_type) VALUES (?)`;
+        db.run(sql, [log.event_type], function (err) {
             if (err) reject(err);
             else resolve(this.lastID);
         });
@@ -32,7 +32,7 @@ const seed = async () => {
             await sleep(delay);
 
             await insertLog(log);
-            console.log(`Added: ${log.description}`);
+            console.log(`Added: ${log.event_type}`);
         }
         console.log(`Successfully added ${sampleLogs.length} logs to the database.`);
     } catch (err) {

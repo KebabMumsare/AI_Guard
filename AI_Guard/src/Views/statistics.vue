@@ -335,19 +335,19 @@ onUnmounted(() => {
                 <tr>
                   <th>Timestamp</th>
                   <th>Event Type</th>
-                  <th>Description</th>
-                  <th>Camera ID</th>
+
+
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="log in logs" :key="log.id">
                   <td>{{ formatDate(log.timestamp) }}</td>
                   <td class="event-type-cell">{{ log.event_type }}</td>
-                  <td>{{ log.description }}</td>
-                  <td class="camera-cell">{{ log.camera_id }}</td>
+
+
                 </tr>
                 <tr v-if="logs.length === 0">
-                  <td colspan="4" class="no-logs">No logs found.</td>
+                  <td colspan="2" class="no-logs">No logs found.</td>
                 </tr>
               </tbody>
             </table>
