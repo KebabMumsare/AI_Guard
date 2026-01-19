@@ -21,7 +21,10 @@ events = []
 events_lock = threading.Lock()
 
 api_data = {
-    'fist_detected': False,
+    'gesture': None,  # 'rock', 'paper', 'scissors', or None
+    'rock_detected': False,
+    'paper_detected': False,
+    'scissors_detected': False,
     'label': '',
     'frame_count': 0,
     'fps': 0.0,
@@ -43,16 +46,80 @@ def open_usb(index, width, height, fps):
         return None
     return cap
 
+def is_finger_extended(landmarks, tip_idx, pip_idx, h, threshold=0):
+    """Check if a finger is extended (tip above pip with optional threshold)"""
+    tip_y = landmarks[tip_idx].y * h
+    pip_y = landmarks[pip_idx].y * h
+    return tip_y < (pip_y + threshold)
+
+def get_finger_curl(landmarks, tip_idx, pip_idx, mcp_idx, h):
+    """Get how much a finger is curled (higher = more curled)"""
+    tip_y = landmarks[tip_idx].y * h
+    pip_y = landmarks[pip_idx].y * h
+    mcp_y = landmarks[mcp_idx].y * h
+    # Return relative position of tip compared to pip-mcp range
+    return (tip_y - pip_y) / max(abs(mcp_y - pip_y), 1)
+
 def is_fist(landmarks, h, w):
+    """Rock: At least 3 fingers folded (more lenient fist detection)"""
     tips = [8, 12, 16, 20]
     pips = [6, 10, 14, 18]
     folded = 0
     for t, p in zip(tips, pips):
         tip_y = landmarks[t].y * h
         pip_y = landmarks[p].y * h
-        if tip_y > pip_y:
+        # Add small threshold - tip just needs to be near or below pip
+        if tip_y > pip_y - (h * 0.02):
             folded += 1
-    return folded == 4
+    return folded >= 3  # At least 3 fingers folded
+
+def is_scissors(landmarks, h, w):
+    """Scissors: Index and middle finger clearly extended, ring and pinky clearly folded"""
+    # Finger landmarks: tip, dip, pip, mcp
+    # Index: 8, 7, 6, 5
+    # Middle: 12, 11, 10, 9
+    # Ring: 16, 15, 14, 13
+    # Pinky: 20, 19, 18, 17
+    
+    # Get curl values for all fingers
+    index_curl = get_finger_curl(landmarks, 8, 6, 5, h)
+    middle_curl = get_finger_curl(landmarks, 12, 10, 9, h)
+    ring_curl = get_finger_curl(landmarks, 16, 14, 13, h)
+    pinky_curl = get_finger_curl(landmarks, 20, 18, 17, h)
+    
+    # Index and middle must be clearly extended (negative curl or near zero)
+    index_extended = index_curl < 0.3
+    middle_extended = middle_curl < 0.3
+    
+    # Ring and pinky must be clearly MORE folded than index/middle
+    ring_folded = ring_curl > 0.5
+    pinky_folded = pinky_curl > 0.4
+    
+    # Both index and middle extended, AND both ring and pinky folded
+    return index_extended and middle_extended and ring_folded and pinky_folded
+
+def is_paper(landmarks, h, w):
+    """Paper: All 4 fingers clearly extended (open hand)"""
+    tips = [8, 12, 16, 20]
+    pips = [6, 10, 14, 18]
+    mcps = [5, 9, 13, 17]
+    extended = 0
+    for t, p, m in zip(tips, pips, mcps):
+        curl = get_finger_curl(landmarks, t, p, m, h)
+        # Finger must be clearly extended (low curl value)
+        if curl < 0.3:
+            extended += 1
+    return extended == 4  # All 4 fingers must be extended
+
+def detect_gesture(landmarks, h, w):
+    """Detect rock, paper, or scissors gesture"""
+    if is_fist(landmarks, h, w):
+        return 'rock', 'ROCK (FIST)'
+    elif is_scissors(landmarks, h, w):
+        return 'scissors', 'SCISSORS (PEACE)'
+    elif is_paper(landmarks, h, w):
+        return 'paper', 'PAPER (OPEN HAND)'
+    return None, ''
 
 def generate_frames():
     """Generator function to yield video frames for streaming"""
@@ -126,11 +193,24 @@ def api_status():
 
 @app.route('/api/fist')
 def api_fist():
-    """API endpoint to check if fist is detected"""
+    """API endpoint to check if fist is detected (legacy)"""
     global api_data, api_data_lock
     with api_data_lock:
         return jsonify({
-            'fist_detected': api_data['fist_detected'],
+            'fist_detected': api_data['rock_detected'],
+            'label': api_data['label']
+        })
+
+@app.route('/api/gesture')
+def api_gesture():
+    """API endpoint to check current gesture (rock/paper/scissors)"""
+    global api_data, api_data_lock
+    with api_data_lock:
+        return jsonify({
+            'gesture': api_data['gesture'],
+            'rock_detected': api_data['rock_detected'],
+            'paper_detected': api_data['paper_detected'],
+            'scissors_detected': api_data['scissors_detected'],
             'label': api_data['label']
         })
 
@@ -179,7 +259,7 @@ def camera_thread(args):
     print(f"Resolution: {args.width}x{args.height} @ {args.fps} FPS")
     print(f"Processing MediaPipe every {args.process_every} frames")
     
-    fist_state = False
+    current_gesture = None  # 'rock', 'paper', 'scissors', or None
     frame_count = 0
     last_label = ""
     fps_counter = 0
@@ -202,7 +282,10 @@ def camera_thread(args):
             
             # Update API data
             with api_data_lock:
-                api_data['fist_detected'] = fist_state
+                api_data['gesture'] = current_gesture
+                api_data['rock_detected'] = current_gesture == 'rock'
+                api_data['paper_detected'] = current_gesture == 'paper'
+                api_data['scissors_detected'] = current_gesture == 'scissors'
                 api_data['label'] = label if 'label' in locals() else last_label
                 api_data['frame_count'] = frame_count
                 api_data['fps'] = current_fps
@@ -214,28 +297,38 @@ def camera_thread(args):
             h, w = frame.shape[:2]
 
             label = ""
+            detected_gesture = None
             if res.multi_hand_landmarks:
                 lms = res.multi_hand_landmarks[0].landmark
-                if is_fist(lms, h, w):
-                    label = "ROCK (FIST)"
-                    if not fist_state:
-                        print("ROCK detected")
-                        with events_lock:
-                            events.append({
-                                "event_type": "Fist Detected",
-                                "description": "Fist gesture detected",
-                                "camera_id": "Camera 1",
-                                "timestamp": time.time()
-                            })
-                    fist_state = True
-                else:
-                    fist_state = False
+                detected_gesture, label = detect_gesture(lms, h, w)
+                
+                # Log event if gesture changed
+                if detected_gesture and detected_gesture != current_gesture:
+                    gesture_names = {
+                        'rock': ('ROCK', 'Fist gesture detected'),
+                        'paper': ('PAPER', 'Open hand gesture detected'),
+                        'scissors': ('SCISSORS', 'Peace sign gesture detected')
+                    }
+                    name, desc = gesture_names[detected_gesture]
+                    print(f"{name} detected")
+                    with events_lock:
+                        events.append({
+                            "event_type": f"{name} Detected",
+                            "description": desc,
+                            "camera_id": "Camera 1",
+                            "timestamp": time.time()
+                        })
+                
+                current_gesture = detected_gesture
             else:
-                fist_state = False
+                current_gesture = None
             
             last_label = label
             with api_data_lock:
-                api_data['fist_detected'] = fist_state
+                api_data['gesture'] = current_gesture
+                api_data['rock_detected'] = current_gesture == 'rock'
+                api_data['paper_detected'] = current_gesture == 'paper'
+                api_data['scissors_detected'] = current_gesture == 'scissors'
                 api_data['label'] = label
                 api_data['frame_count'] = frame_count
                 api_data['timestamp'] = time.time()
@@ -244,7 +337,10 @@ def camera_thread(args):
             label = last_label
 
             with api_data_lock:
-                api_data['fist_detected'] = fist_state
+                api_data['gesture'] = current_gesture
+                api_data['rock_detected'] = current_gesture == 'rock'
+                api_data['paper_detected'] = current_gesture == 'paper'
+                api_data['scissors_detected'] = current_gesture == 'scissors'
                 api_data['label'] = label
                 api_data['frame_count'] = frame_count
 
