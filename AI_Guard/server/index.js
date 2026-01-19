@@ -136,7 +136,30 @@ app.get('/api/logs', (req, res) => {
     });
 });
 
-// 3. Get Statistics (Graph Data)
+// 3. Get All Events (for graphs)
+// Returns all events in a format compatible with the frontend graphs
+app.get('/api/events', (req, res) => {
+    const sql = `SELECT id, event_type, timestamp FROM logs ORDER BY timestamp DESC`;
+    
+    db.all(sql, [], (err, rows) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        
+        // Map to format expected by BlockGraph component
+        const events = rows.map(row => ({
+            eventName: row.event_type,
+            timestamp: row.timestamp,
+            accuracy: null,
+            screenshot: null
+        }));
+        
+        res.json(events);
+    });
+});
+
+// 4. Get Statistics (Graph Data)
 // Aggregates logs by day of the week for the Graph page.
 app.get('/api/stats', (req, res) => {
     // Get logs from the last 7 days

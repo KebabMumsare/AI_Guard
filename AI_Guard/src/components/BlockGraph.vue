@@ -28,6 +28,14 @@ const selectedEvent = ref('TOTAL')
 // Check if showing total events
 const isTotalEvents = computed(() => selectedEvent.value === 'TOTAL')
 
+// Helper to get local date string (YYYY-MM-DD) without timezone shift
+const getLocalDateString = (date) => {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 // Get current week structure (Monday to Sunday)
 const getCurrentWeek = () => {
   const today = new Date()
@@ -44,7 +52,7 @@ const getCurrentWeek = () => {
   for (let i = 0; i < 7; i++) {
     const date = new Date(monday)
     date.setDate(monday.getDate() + i)
-    const dateKey = date.toISOString().split('T')[0]
+    const dateKey = getLocalDateString(date)
     
     week.push({
       date: dateKey,
@@ -83,7 +91,7 @@ const data = computed(() => {
   const groupedByDate = {}
   eventsToProcess.forEach(event => {
     const date = new Date(event.timestamp)
-    const dateKey = date.toISOString().split('T')[0]
+    const dateKey = getLocalDateString(date)
     
     if (!groupedByDate[dateKey]) {
       groupedByDate[dateKey] = {

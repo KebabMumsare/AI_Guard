@@ -2,12 +2,32 @@
 import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import BlockGraph from '../components/BlockGraph.vue'
 import PageTitle from '../components/PageTitle.vue'
-import mockData from '../data/mockData.json'
 import { Chart, registerables } from 'chart.js'
 
 Chart.register(...registerables)
 
-const events = ref(Array.isArray(mockData) ? mockData : [])
+const events = ref([])
+const eventsLoading = ref(true)
+const eventsError = ref(null)
+
+// Function to fetch events from the backend API for the graphs
+const fetchEvents = async () => {
+  eventsLoading.value = true
+  eventsError.value = null
+  try {
+    const response = await fetch('/api/events')
+    if (!response.ok) throw new Error('Failed to fetch events')
+    
+    const data = await response.json()
+    events.value = Array.isArray(data) ? data : []
+  } catch (err) {
+    console.error('Error fetching events:', err)
+    eventsError.value = 'Failed to load events data.'
+    events.value = []
+  } finally {
+    eventsLoading.value = false
+  }
+}
 const chartCanvas = ref(null)
 const chartInstance = ref(null)
 
@@ -279,11 +299,19 @@ const initializeDefaultChart = () => {
 
 // When the component loads...
 onMounted(async () => {
-  fetchLogs(currentPage.value)
-  // Refresh current page every 10 seconds
-  intervalId = setInterval(() => fetchLogs(currentPage.value), 10000)
+  // Fetch events for the graphs
+  await fetchEvents()
   
-  // Initialize the default line graph after DOM is ready
+  // Fetch logs for the table
+  fetchLogs(currentPage.value)
+  
+  // Refresh events and logs every 10 seconds
+  intervalId = setInterval(() => {
+    fetchEvents()
+    fetchLogs(currentPage.value)
+  }, 10000)
+  
+  // Initialize the default line graph after DOM is ready and events are loaded
   await nextTick()
   initializeDefaultChart()
 })
