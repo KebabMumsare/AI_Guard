@@ -21,10 +21,11 @@ events = []
 events_lock = threading.Lock()
 
 api_data = {
-    'gesture': None,  # 'rock', 'paper', 'scissors', or None
+    'gesture': None,  # 'rock', 'paper', 'scissors', 'middle_finger', or None
     'rock_detected': False,
     'paper_detected': False,
     'scissors_detected': False,
+    'middle_finger_detected': False,
     'label': '',
     'frame_count': 0,
     'fps': 0.0,
@@ -98,6 +99,24 @@ def is_scissors(landmarks, h, w):
     # Both index and middle extended, AND both ring and pinky folded
     return index_extended and middle_extended and ring_folded and pinky_folded
 
+def is_middle_finger(landmarks, h, w):
+    """Middle finger: Only middle finger extended, all others folded"""
+    # Get curl values for all fingers
+    index_curl = get_finger_curl(landmarks, 8, 6, 5, h)
+    middle_curl = get_finger_curl(landmarks, 12, 10, 9, h)
+    ring_curl = get_finger_curl(landmarks, 16, 14, 13, h)
+    pinky_curl = get_finger_curl(landmarks, 20, 18, 17, h)
+    
+    # Middle finger must be clearly extended
+    middle_extended = middle_curl < 0.3
+    
+    # All other fingers must be folded
+    index_folded = index_curl > 0.4
+    ring_folded = ring_curl > 0.4
+    pinky_folded = pinky_curl > 0.4
+    
+    return middle_extended and index_folded and ring_folded and pinky_folded
+
 def is_paper(landmarks, h, w):
     """Paper: All 4 fingers clearly extended (open hand)"""
     tips = [8, 12, 16, 20]
@@ -112,9 +131,11 @@ def is_paper(landmarks, h, w):
     return extended == 4  # All 4 fingers must be extended
 
 def detect_gesture(landmarks, h, w):
-    """Detect rock, paper, or scissors gesture"""
+    """Detect rock, paper, scissors, or middle finger gesture"""
     if is_fist(landmarks, h, w):
         return 'rock', 'ROCK (FIST)'
+    elif is_middle_finger(landmarks, h, w):
+        return 'middle_finger', 'MIDDLE FINGER'
     elif is_scissors(landmarks, h, w):
         return 'scissors', 'SCISSORS (PEACE)'
     elif is_paper(landmarks, h, w):
@@ -203,7 +224,7 @@ def api_fist():
 
 @app.route('/api/gesture')
 def api_gesture():
-    """API endpoint to check current gesture (rock/paper/scissors)"""
+    """API endpoint to check current gesture (rock/paper/scissors/middle_finger)"""
     global api_data, api_data_lock
     with api_data_lock:
         return jsonify({
@@ -211,6 +232,7 @@ def api_gesture():
             'rock_detected': api_data['rock_detected'],
             'paper_detected': api_data['paper_detected'],
             'scissors_detected': api_data['scissors_detected'],
+            'middle_finger_detected': api_data['middle_finger_detected'],
             'label': api_data['label']
         })
 
@@ -257,13 +279,14 @@ def camera_thread(args):
 
     print("Camera thread started. Processing frames...")
     print(f"Resolution: {args.width}x{args.height} @ {args.fps} FPS")
-    print(f"Processing MediaPipe every {args.process_every} frames")
+    print(f"Processing MediaPipe every {args.process_interval} seconds")
     
     current_gesture = None  # 'rock', 'paper', 'scissors', or None
     frame_count = 0
     last_label = ""
     fps_counter = 0
     fps_start_time = time.time()
+    last_process_time = 0  # Track when we last processed MediaPipe
 
     while True:
         ok, frame = camera.read()
@@ -286,12 +309,15 @@ def camera_thread(args):
                 api_data['rock_detected'] = current_gesture == 'rock'
                 api_data['paper_detected'] = current_gesture == 'paper'
                 api_data['scissors_detected'] = current_gesture == 'scissors'
+                api_data['middle_finger_detected'] = current_gesture == 'middle_finger'
                 api_data['label'] = label if 'label' in locals() else last_label
                 api_data['frame_count'] = frame_count
                 api_data['fps'] = current_fps
                 api_data['timestamp'] = time.time()
-        # Only process MediaPipe every N frames to reduce CPU load
-        if frame_count % args.process_every == 0:
+        # Only process MediaPipe every N seconds to reduce CPU load
+        current_time = time.time()
+        if current_time - last_process_time >= args.process_interval:
+            last_process_time = current_time
             rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             res = hands.process(rgb)
             h, w = frame.shape[:2]
@@ -307,7 +333,8 @@ def camera_thread(args):
                     gesture_names = {
                         'rock': ('ROCK', 'Fist gesture detected'),
                         'paper': ('PAPER', 'Open hand gesture detected'),
-                        'scissors': ('SCISSORS', 'Peace sign gesture detected')
+                        'scissors': ('SCISSORS', 'Peace sign gesture detected'),
+                        'middle_finger': ('MIDDLE FINGER', 'Middle finger gesture detected')
                     }
                     name, desc = gesture_names[detected_gesture]
                     print(f"{name} detected")
@@ -329,6 +356,7 @@ def camera_thread(args):
                 api_data['rock_detected'] = current_gesture == 'rock'
                 api_data['paper_detected'] = current_gesture == 'paper'
                 api_data['scissors_detected'] = current_gesture == 'scissors'
+                api_data['middle_finger_detected'] = current_gesture == 'middle_finger'
                 api_data['label'] = label
                 api_data['frame_count'] = frame_count
                 api_data['timestamp'] = time.time()
@@ -341,6 +369,7 @@ def camera_thread(args):
                 api_data['rock_detected'] = current_gesture == 'rock'
                 api_data['paper_detected'] = current_gesture == 'paper'
                 api_data['scissors_detected'] = current_gesture == 'scissors'
+                api_data['middle_finger_detected'] = current_gesture == 'middle_finger'
                 api_data['label'] = label
                 api_data['frame_count'] = frame_count
 
@@ -363,7 +392,7 @@ if __name__ == '__main__':
     ap.add_argument("--height", type=int, default=480)  # Lower default for better performance
     ap.add_argument("--fps", type=int, default=15)     # Lower default for smoother streaming
     ap.add_argument("--port", type=int, default=5000)
-    ap.add_argument("--process-every", type=int, default=3, help="Process MediaPipe every N frames (default: 3)")
+    ap.add_argument("--process-interval", type=float, default=1, help="Process MediaPipe every N seconds (default: 0.5)")
     args = ap.parse_args()
     
     # Start camera thread
