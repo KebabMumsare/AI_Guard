@@ -19,7 +19,7 @@ let statusInterval = null
 
 const fetchCameraStatus = async () => {
   try {
-    const response = await fetch('http://localhost:3000/api/camera/status')
+    const response = await fetch('http://192.168.50.26:5000/api/camera/status')
     const data = await response.json()
     streamEnabled.value = data.enabled
   } catch (error) {

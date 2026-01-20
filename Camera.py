@@ -7,9 +7,13 @@ import mediapipe as mp
 from flask import Flask, Response, render_template_string, jsonify
 from flask_cors import CORS
 import threading
+import requests
 
 app = Flask(__name__)
 CORS(app)
+
+# Configuration - Node.js backend URL
+NODE_BACKEND_URL = os.environ.get('NODE_BACKEND_URL', 'http://localhost:3000')
 
 # Global variables for camera and frame
 camera = None
@@ -19,6 +23,28 @@ frame_lock = threading.Lock()
 # Events tracking
 events = []
 events_lock = threading.Lock()
+
+
+def send_event_to_backend(event_data):
+    """Send event to Node.js backend asynchronously"""
+
+    def send():
+        try:
+            response = requests.post(
+                f'{NODE_BACKEND_URL}/api/log',
+                json=event_data,
+                timeout=2  # 2 second timeout
+            )
+            if response.status_code == 200:
+                print(f"Event sent to backend: {event_data['event_type']}")
+            else:
+                print(f"Backend responded with status {response.status_code}")
+        except requests.exceptions.RequestException as e:
+            print(f"Failed to send event to backend: {e}")
+
+    # Send in background thread to not block camera processing
+    thread = threading.Thread(target=send, daemon=True)
+    thread.start()
 
 api_data = {
     'gesture': None,  # 'rock', 'paper', 'scissors', 'middle_finger', or None
@@ -62,7 +88,7 @@ def get_finger_curl(landmarks, tip_idx, pip_idx, mcp_idx, h):
     return (tip_y - pip_y) / max(abs(mcp_y - pip_y), 1)
 
 def is_fist(landmarks, h, w):
-    """Rock: At least 3 fingers folded (more lenient fist detection)"""
+    """Rock: All 4 fingers folded (fist)"""
     tips = [8, 12, 16, 20]
     pips = [6, 10, 14, 18]
     folded = 0
@@ -72,7 +98,7 @@ def is_fist(landmarks, h, w):
         # Add small threshold - tip just needs to be near or below pip
         if tip_y > pip_y - (h * 0.02):
             folded += 1
-    return folded >= 3  # At least 3 fingers folded
+    return folded == 4  # All 4 fingers must be folded
 
 def is_scissors(landmarks, h, w):
     """Scissors: Index and middle finger clearly extended, ring and pinky clearly folded"""
@@ -107,15 +133,20 @@ def is_middle_finger(landmarks, h, w):
     ring_curl = get_finger_curl(landmarks, 16, 14, 13, h)
     pinky_curl = get_finger_curl(landmarks, 20, 18, 17, h)
     
-    # Middle finger must be clearly extended
-    middle_extended = middle_curl < 0.3
+    # Middle finger must be extended
+    middle_extended = middle_curl < 0.6
     
-    # All other fingers must be folded
-    index_folded = index_curl > 0.4
-    ring_folded = ring_curl > 0.4
-    pinky_folded = pinky_curl > 0.4
+    # Other fingers should be more curled than middle (at least 2 of them)
+    fingers_more_folded = 0
+    if index_curl > middle_curl + 0.1:
+        fingers_more_folded += 1
+    if ring_curl > middle_curl + 0.1:
+        fingers_more_folded += 1
+    if pinky_curl > middle_curl + 0.1:
+        fingers_more_folded += 1
     
-    return middle_extended and index_folded and ring_folded and pinky_folded
+    # At least 2 other fingers should be more folded than middle
+    return middle_extended and fingers_more_folded >= 2
 
 def is_paper(landmarks, h, w):
     """Paper: All 4 fingers clearly extended (open hand)"""
@@ -132,10 +163,11 @@ def is_paper(landmarks, h, w):
 
 def detect_gesture(landmarks, h, w):
     """Detect rock, paper, scissors, or middle finger gesture"""
-    if is_fist(landmarks, h, w):
-        return 'rock', 'ROCK (FIST)'
-    elif is_middle_finger(landmarks, h, w):
+    # Check middle finger FIRST (before fist, since fist would match 3 folded fingers)
+    if is_middle_finger(landmarks, h, w):
         return 'middle_finger', 'MIDDLE FINGER'
+    elif is_fist(landmarks, h, w):
+        return 'rock', 'ROCK (FIST)'
     elif is_scissors(landmarks, h, w):
         return 'scissors', 'SCISSORS (PEACE)'
     elif is_paper(landmarks, h, w):
@@ -276,10 +308,6 @@ def camera_thread(args):
     mp_hands = mp.solutions.hands
     hands = mp_hands.Hands(model_complexity=0, max_num_hands=1,
                            min_detection_confidence=0.5, min_tracking_confidence=0.5)
-
-    print("Camera thread started. Processing frames...")
-    print(f"Resolution: {args.width}x{args.height} @ {args.fps} FPS")
-    print(f"Processing MediaPipe every {args.process_interval} seconds")
     
     current_gesture = None  # 'rock', 'paper', 'scissors', or None
     frame_count = 0
@@ -338,13 +366,20 @@ def camera_thread(args):
                     }
                     name, desc = gesture_names[detected_gesture]
                     print(f"{name} detected")
+
+                    event_data = {
+                        "event_type": f"{name} Detected",
+                        "description": desc,
+                        "camera_id": "Camera 1",
+                        "timestamp": time.time()
+                    }
+
+                    # Store locally (for /events endpoint)
                     with events_lock:
-                        events.append({
-                            "event_type": f"{name} Detected",
-                            "description": desc,
-                            "camera_id": "Camera 1",
-                            "timestamp": time.time()
-                        })
+                        events.append(event_data)
+
+                    # Send to Node.js backend
+                    send_event_to_backend(event_data)
                 
                 current_gesture = detected_gesture
             else:
@@ -392,7 +427,7 @@ if __name__ == '__main__':
     ap.add_argument("--height", type=int, default=480)  # Lower default for better performance
     ap.add_argument("--fps", type=int, default=15)     # Lower default for smoother streaming
     ap.add_argument("--port", type=int, default=5000)
-    ap.add_argument("--process-interval", type=float, default=1, help="Process MediaPipe every N seconds (default: 0.5)")
+    ap.add_argument("--process-interval", type=float, default=0.7, help="Process MediaPipe every N seconds (default: 0.5)")
     args = ap.parse_args()
     
     # Start camera thread
