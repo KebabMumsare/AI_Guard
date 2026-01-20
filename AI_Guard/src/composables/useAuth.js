@@ -9,7 +9,7 @@ export function useAuth() {
 
     const login = async (username, password) => {
         try {
-            const response = await fetch('http://localhost:3000/api/login', {
+            const response = await fetch('http://192.168.50.26:5000/api/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
