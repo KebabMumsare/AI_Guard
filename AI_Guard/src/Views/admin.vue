@@ -6,7 +6,7 @@ const streamEnabled = ref(true)
 
 const fetchStatus = async () => {
   try {
-    const response = await fetch('http://192.168.50.26:5500/api/camera/status')
+    const response = await fetch('http://192.168.50.26:5000/api/camera/status')
     const data = await response.json()
     streamEnabled.value = data.enabled
   } catch (error) {
@@ -16,7 +16,7 @@ const fetchStatus = async () => {
 
 const toggleStream = async () => {
   try {
-    const response = await fetch('http://192.168.50.26:5500/api/camera/toggle', {
+    const response = await fetch('http://192.168.50.26:5000/api/camera/toggle', {
       method: 'POST'
     })
     const data = await response.json()
