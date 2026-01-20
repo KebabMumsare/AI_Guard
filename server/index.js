@@ -140,13 +140,13 @@ app.get('/api/logs', (req, res) => {
 // Returns all events in a format compatible with the frontend graphs
 app.get('/api/events', (req, res) => {
     const sql = `SELECT id, event_type, timestamp FROM logs ORDER BY timestamp DESC`;
-    
+
     db.all(sql, [], (err, rows) => {
         if (err) {
             res.status(500).json({ error: err.message });
             return;
         }
-        
+
         // Map to format expected by BlockGraph component
         const events = rows.map(row => ({
             eventName: row.event_type,
@@ -154,7 +154,7 @@ app.get('/api/events', (req, res) => {
             accuracy: null,
             screenshot: null
         }));
-        
+
         res.json(events);
     });
 });
@@ -219,6 +219,18 @@ app.get('/api/admin/stats', (req, res) => {
             });
         });
     });
+});
+
+// 5. Camera Control
+let cameraEnabled = true;
+
+app.get('/api/camera/status', (req, res) => {
+    res.json({ enabled: cameraEnabled });
+});
+
+app.post('/api/camera/toggle', (req, res) => {
+    cameraEnabled = !cameraEnabled;
+    res.json({ enabled: cameraEnabled, message: `Camera ${cameraEnabled ? 'enabled' : 'disabled'}` });
 });
 
 // Start the server

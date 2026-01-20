@@ -7,6 +7,7 @@ const isFullscreen = ref(false)
 const cameraName = ref('Camera 1')
 const connectionStatus = ref('online')
 const currentTime = ref(new Date().toLocaleTimeString())
+const streamEnabled = ref(true)
 const recentEvents = ref([
   { type: 'Motion Detected', time: '14:32:15' },
   { type: 'Person Detected', time: '14:28:42' },
@@ -14,16 +15,33 @@ const recentEvents = ref([
 ])
 
 let timeInterval = null
+let statusInterval = null
+
+const fetchCameraStatus = async () => {
+  try {
+    const response = await fetch('http://localhost:3000/api/camera/status')
+    const data = await response.json()
+    streamEnabled.value = data.enabled
+  } catch (error) {
+    console.error('Error fetching camera status:', error)
+  }
+}
 
 onMounted(() => {
   timeInterval = setInterval(() => {
     currentTime.value = new Date().toLocaleTimeString()
   }, 1000)
+  
+  fetchCameraStatus()
+  statusInterval = setInterval(fetchCameraStatus, 2000)
 })
 
 onUnmounted(() => {
   if (timeInterval) {
     clearInterval(timeInterval)
+  }
+  if (statusInterval) {
+    clearInterval(statusInterval)
   }
 })
 
@@ -56,7 +74,13 @@ onMounted(() => {
       <div class="video-section">
         <div class="video-container relative w-full bg-black overflow-hidden">
           <div class="w-full h-full flex items-center justify-center bg-black" style="aspect-ratio: 16/9; min-height: 400px;">
-            <img src="http://192.168.50.26:5500/video_feed" alt="Camera Stream" class="w-full h-full object-contain">
+            <img v-if="streamEnabled" src="http://192.168.50.26:5500/video_feed" alt="Camera Stream" class="w-full h-full object-contain">
+            <div v-else class="flex flex-col items-center justify-center text-gray-500">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+              </svg>
+              <span class="text-xl font-semibold">Camera Disabled</span>
+            </div>
           </div>
           
           <div class="absolute top-4 left-4 flex items-center gap-2 bg-black bg-opacity-70 px-3 py-1.5 rounded-md">

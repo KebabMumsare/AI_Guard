@@ -1,13 +1,37 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import PageTitle from '../components/PageTitle.vue'
 
 const streamEnabled = ref(true)
 
-const toggleStream = () => {
-  streamEnabled.value = !streamEnabled.value
-  console.log('Stream toggled:', streamEnabled.value ? 'ON' : 'OFF')
+const fetchStatus = async () => {
+  try {
+    const response = await fetch('http://localhost:3000/api/camera/status')
+    const data = await response.json()
+    streamEnabled.value = data.enabled
+  } catch (error) {
+    console.error('Error fetching camera status:', error)
+  }
 }
+
+const toggleStream = async () => {
+  try {
+    const response = await fetch('http://localhost:3000/api/camera/toggle', {
+      method: 'POST'
+    })
+    const data = await response.json()
+    streamEnabled.value = data.enabled
+    console.log('Stream toggled:', streamEnabled.value ? 'ON' : 'OFF')
+  } catch (error) {
+    console.error('Error toggling stream:', error)
+    // Revert on error
+    streamEnabled.value = !streamEnabled.value
+  }
+}
+
+onMounted(() => {
+  fetchStatus()
+})
 </script>
 
 <template>
