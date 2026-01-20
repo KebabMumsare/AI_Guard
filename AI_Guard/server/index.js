@@ -75,7 +75,7 @@ app.post('/api/login', (req, res) => {
 // Receives data from the Camera/Jetson Nano and saves it to the database.
 // Expected body: { event_type: "Person Detected", description: "...", camera_id: "..." }
 app.post('/api/log', (req, res) => {
-    const { event_type } = req.body;
+    const { event_type, description, camera_id, timestamp } = req.body;
 
     if (!event_type) {
         return res.status(400).json({ error: 'event_type is required' });
@@ -92,7 +92,7 @@ app.post('/api/log', (req, res) => {
         res.json({
             message: 'Log entry created',
             id: this.lastID,
-            data: { event_type }
+            data: { event_type, description, camera_id, timestamp }
         });
     });
 });
